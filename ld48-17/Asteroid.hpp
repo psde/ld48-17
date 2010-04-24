@@ -10,6 +10,8 @@ class Asteroid
 {
 	private:
 		Gosu::Graphics* graphics;
+		Gosu::Input* input;
+
 		Gosu::Image* img;
 		Gosu::Image* imgBuildMap;
 		Gosu::Bitmap buildMap;
@@ -22,7 +24,7 @@ class Asteroid
 		const bool capturable;
 		double x, y;
 
-		Asteroid(Gosu::Graphics* graphics, bool capturable, double x, double y, int type);
+		Asteroid(Gosu::Graphics* graphics, Gosu::Input* input, bool capturable, double x, double y, int type);
 		
 
 		void draw(BuildingRenderer &buildRenderer, int scrollX, int scrollY);

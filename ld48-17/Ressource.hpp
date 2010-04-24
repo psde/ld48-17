@@ -10,10 +10,9 @@ enum RessourceType
 
 class Ressource
 {
-	private:
+	public:
 		RessourceType type;
 
-	public:
 };
 
 #endif

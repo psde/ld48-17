@@ -1,8 +1,8 @@
 #include "Asteroid.hpp"
 
 
-Asteroid::Asteroid(Gosu::Graphics* graphics, bool capturable, double x, double y, int type)
-: graphics(graphics), capturable(capturable), x(x), y(y)
+Asteroid::Asteroid(Gosu::Graphics* graphics, Gosu::Input* input, bool capturable, double x, double y, int type)
+: graphics(graphics), input(input), capturable(capturable), x(x), y(y)
 {
 	this->img = new Gosu::Image(*graphics, L"data/asteroids/1.png");
 	
@@ -72,7 +72,13 @@ void Asteroid::draw(BuildingRenderer &buildRenderer, int scrollX, int scrollY)
 	{
 		Building curBuild = (*it);
 
-		buildRenderer.draw(curBuild, this->x + curBuild.x - scrollX, this->y + curBuild.y - scrollY, 11);
+		bool hover = false;
+		if(Gosu::distance(this->x + curBuild.x - scrollX + 20, this->y + curBuild.y - scrollY + 20, input->mouseX(), input->mouseY()) < 15) 
+		{
+			hover = true;
+		}
+
+		buildRenderer.draw(curBuild, this->x + curBuild.x - scrollX, this->y + curBuild.y - scrollY, 11, hover);
 
 		/*this->buildingBackdrop->draw(this->x + curBuild.x - scrollX, this->y + curBuild.y - scrollY, 11);
 		this->buildingEnergy->draw(this->x + curBuild.x - scrollX, this->y + curBuild.y - scrollY, 12);*/
@@ -83,7 +89,10 @@ void Asteroid::draw(BuildingRenderer &buildRenderer, int scrollX, int scrollY)
 
 void Asteroid::update()
 {
-	Gosu::Color test;
+	for(vector<Building>::iterator it = this->buildings.begin(); it != this->buildings.end(); ++it)
+	{
+		(*it).update();
+	}
 }
 
 bool Asteroid::isFree(int x, int y)

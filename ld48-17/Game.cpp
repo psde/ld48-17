@@ -13,7 +13,7 @@ Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
 
 	for(int i = 0; i < 1; i++)
 	{
-		Asteroid* newAsteroid = new Asteroid(graphics, true, 100, 100, 1);
+		Asteroid* newAsteroid = new Asteroid(graphics, input, true, 100, 100, 1);
 		this->asteroids.push_back(newAsteroid);
 	}
 	this->gamemap = new Map(graphics, 1000);
@@ -47,9 +47,9 @@ void Game::draw()
 	this->cursor->draw(320, 20, 1001);
 	graphics->drawLine(360, 20, Gosu::Colors::aqua, 380, 40, Gosu::Colors::aqua, 1001);
 	graphics->drawLine(410, 20, Gosu::Colors::red, 430, 40, Gosu::Colors::red, 1001);
-	this->buildRenderer->draw(Building(0, 0, EnergyCollector), 450, 10, 1001);
-	this->buildRenderer->draw(Building(0, 0, Mine), 500, 10, 1001);
-	this->buildRenderer->draw(Building(0, 0, Depot), 550, 10, 1001);
+	this->buildRenderer->draw(Building(0, 0, EnergyCollector), 450, 10, 1001, false);
+	this->buildRenderer->draw(Building(0, 0, Mine), 500, 10, 1001, false);
+	this->buildRenderer->draw(Building(0, 0, Depot), 550, 10, 1001, false);
 	
 
 /*
