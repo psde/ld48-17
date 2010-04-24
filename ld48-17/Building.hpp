@@ -29,6 +29,7 @@ class Building
 		int tick;
 		int maxTick;
 		int internalDepot[3];
+		int wantsRes[3];
 
 		Building(double x, double y, BuildingType type, RessourceArea* area = 0)
 			: x(x), y(y), type(type), energyIn(0), energyOut(-1), energyRequirement(-1), energySupplied(0), disabled(false), area(area), tick(0)
@@ -37,6 +38,10 @@ class Building
 			this->internalDepot[1] = 0;
 			this->internalDepot[2] = 0;
 
+			this->wantsRes[0] = 0;
+			this->wantsRes[1] = 0;
+			this->wantsRes[2] = 0;
+
 			if(type == Mine) {
 				energyRequirement = 10;
 				if(this->area != 0)
@@ -44,18 +49,24 @@ class Building
 					switch(this->area->type)
 					{
 						case Ore:
-							this->maxTick = 200;
+							this->maxTick = 50;
 						
 						case Silicon:
-							this->maxTick = 100;
+							this->maxTick = 50;
 
 						case Uranium:
-							this->maxTick = 300;
+							this->maxTick = 50;
 					}
 				}
 			}
 
-			if(type == Depot) energyRequirement = 2;
+			if(type == Depot)
+			{
+				energyRequirement = 2;
+				this->wantsRes[0] = -1;
+				this->wantsRes[1] = -1;
+				this->wantsRes[2] = -1;
+			}
 			if(type == Factory) energyRequirement = 25;
 		}
 

@@ -4,6 +4,7 @@
 #include "Game.hpp"
 
 #include "BuildingRenderer.hpp"
+#include "RessourceRenderer.hpp"
 
 #include "Asteroid.hpp"
 #include "Map.hpp"
@@ -36,9 +37,12 @@ class Game
 		Gosu::Image* cursor;
 
 		BuildingRenderer* buildRenderer;
+		RessourceRenderer* resRenderer;
 
 		Building* lineStart;
 		Asteroid* lineAsteroid;
+
+		int activeAsteroid;
 
 	public:
 		PlayingState playState;

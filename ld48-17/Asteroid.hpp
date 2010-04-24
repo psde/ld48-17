@@ -14,6 +14,8 @@ class Asteroid
 		Gosu::Graphics* graphics;
 		Gosu::Input* input;
 
+		RessourceRenderer* resRenderer;
+
 		Gosu::Image* img;
 		Gosu::Image* imgBuildMap;
 		Gosu::Bitmap buildMap;
@@ -26,9 +28,9 @@ class Asteroid
 
 	public:
 		const bool capturable;
-		double x, y;
+		double x, y, w, h;
 
-		Asteroid(Gosu::Graphics* graphics, Gosu::Input* input, bool capturable, double x, double y, int type);
+		Asteroid(Gosu::Graphics* graphics, Gosu::Input* input, RessourceRenderer* resRenderer, bool capturable, double x, double y, int type);
 		
 
 		void draw(BuildingRenderer &buildRenderer, int scrollX, int scrollY);
@@ -42,6 +44,8 @@ class Asteroid
 
 		bool isInsideRessourceArea(int x, int y, RessourceArea* curArea);
 		RessourceArea* getRessourceAreaAt(int x, int y);
+
+		int* getRessources();
 };
 
 #endif

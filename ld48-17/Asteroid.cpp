@@ -1,16 +1,18 @@
 #include "Asteroid.hpp"
 
 
-Asteroid::Asteroid(Gosu::Graphics* graphics, Gosu::Input* input, bool capturable, double x, double y, int type)
-: graphics(graphics), input(input), capturable(capturable), x(x), y(y)
+Asteroid::Asteroid(Gosu::Graphics* graphics,  Gosu::Input* input, RessourceRenderer* resRenderer, bool capturable, double x, double y, int type)
+: graphics(graphics), input(input), resRenderer(resRenderer), capturable(capturable), x(x), y(y)
 {
 	this->img = new Gosu::Image(*graphics, L"data/asteroids/1.png");
+	this->w = this->img->width();
+	this->h = this->img->height();
 	
 	this->imgBuildMap = new Gosu::Image(*graphics, L"data/asteroids/1.bmp");
 	this->buildMap = Gosu::quickLoadBitmap(L"data/asteroids/1.bmp");
 
-	/*Building test(100, 50, EnergyCollector);
-	this->buildings.push_back(test);*/
+
+
 
 	// Ressource-Area test:
 
@@ -26,6 +28,28 @@ Asteroid::Asteroid(Gosu::Graphics* graphics, Gosu::Input* input, bool capturable
 	testRA->area.push_back(Point2D(178, 94));
 	testRA->area.push_back(Point2D(226, 052));
 	this->ressourceAreas.push_back(testRA);
+
+
+	Building* test1 = new Building(100, 50, EnergyCollector);
+	this->buildings.push_back(test1);
+
+	RessourceArea* tmpRA = this->getRessourceAreaAt(270, 100);
+	Building* test2 = new Building(270, 100, Mine, tmpRA);
+	this->buildings.push_back(test2);
+
+	Building* test3 = new Building(350, 250, Depot);
+	this->buildings.push_back(test3);
+
+
+	Line* newLine = new Line(graphics, resRenderer, 0);
+	newLine->start = test1;
+	newLine->end = test2;
+	this->addLine(newLine);
+	
+	newLine = new Line(graphics, resRenderer, 1);
+	newLine->start = test2;
+	newLine->end = test3;
+	this->addLine(newLine);
 
 }
 
@@ -93,7 +117,7 @@ void Asteroid::update()
 bool Asteroid::isFree(int x, int y)
 {
 	if(x < 0 || y < 0) return false;
-	if(x > (int)this->buildMap.width() || y > (int)this->buildMap.height()) return false;
+	if(x >= (int)this->buildMap.width() || y >= (int)this->buildMap.height()) return false;
 
 	for(vector<Building*>::iterator it = this->buildings.begin(); it != this->buildings.end(); ++it)
 	{
@@ -176,4 +200,25 @@ Building* Asteroid::getBuildingAt(int x, int y, int scrollX, int scrollY)
 void Asteroid::addLine(Line *l)
 {
 	this->lines.push_back(l);
+}
+
+int* Asteroid::getRessources()
+{
+	int* foo = new int[3];
+	foo[0] = 0;
+	foo[1] = 0;
+	foo[2] = 0;
+
+	for(vector<Building*>::iterator it = this->buildings.begin(); it != this->buildings.end(); ++it)
+	{
+		Building* curBuild = (*it);
+		if(curBuild->type == Depot)
+		{
+			foo[0] += curBuild->internalDepot[0];
+			foo[1] += curBuild->internalDepot[1];
+			foo[2] += curBuild->internalDepot[2];
+		}
+	}
+
+	return foo;
 }

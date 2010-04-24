@@ -228,6 +228,10 @@
 				RelativePath=".\RessourceArea.hpp"
 				>
 			</File>
+			<File
+				RelativePath=".\RessourceRenderer.hpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

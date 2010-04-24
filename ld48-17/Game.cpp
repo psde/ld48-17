@@ -7,6 +7,7 @@ Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
 	this->cursor = new Gosu::Image(*graphics, L"data/cursor.png");
 
 	this->buildRenderer = new BuildingRenderer(graphics);
+	this->resRenderer = new RessourceRenderer(graphics);
 	this->lineStart = 0;
 
 	this->smallFont = new Gosu::Font(*graphics, Gosu::defaultFontName(), 14);
@@ -18,14 +19,15 @@ Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
 		this->asteroids.push_back(newAsteroid);
 	}*/
 
-	Asteroid* newAsteroid1 = new Asteroid(graphics, input, true, 100, 100, 1);
+	Asteroid* newAsteroid1 = new Asteroid(graphics, input, resRenderer, true, 100, 100, 1);
 	this->asteroids.push_back(newAsteroid1);
 
-	Asteroid* newAsteroid2 = new Asteroid(graphics, input, true, 600, 250, 1);
+	Asteroid* newAsteroid2 = new Asteroid(graphics, input, resRenderer, true, 600, 250, 1);
 	this->asteroids.push_back(newAsteroid2);
 
 	this->gamemap = new Map(graphics, 1000);
 	this->playState = Normal;
+	this->activeAsteroid = 0;
 }
 
 void Game::draw()
@@ -43,14 +45,18 @@ void Game::draw()
 	this->smallFont->draw(L"x: " +  boost::lexical_cast<std::wstring>(gamemap->x), 10, 40, 9999);
 	this->smallFont->draw(L"y: " +  boost::lexical_cast<std::wstring>(gamemap->y), 10, 50, 9999);
 
-	bool testFree = this->asteroids[0]->isFree((int)input->mouseX()-120, (int)input->mouseY()-120);
+	bool testFree = this->asteroids[activeAsteroid]->isFree((int)input->mouseX()-120, (int)input->mouseY()-120);
 	this->smallFont->draw(L"free? " +  boost::lexical_cast<std::wstring>(testFree), 10, 60, 9999);
 
 	
-	RessourceArea* testArea = this->asteroids[0]->getRessourceAreaAt((int)input->mouseX()-100, (int)input->mouseY()-100);
+	RessourceArea* testArea = this->asteroids[activeAsteroid]->getRessourceAreaAt((int)input->mouseX()-100, (int)input->mouseY()-100);
 	int testAreaType = -1;
 	if(testArea != 0) testAreaType = testArea->type;
 	this->smallFont->draw(L"free? " +  boost::lexical_cast<std::wstring>(testAreaType), 10, 70, 9999);
+
+
+	this->smallFont->draw(L"active asteroid " +  boost::lexical_cast<std::wstring>(this->activeAsteroid), 10, 80, 9999);
+
 
 
 	// GUI:
@@ -65,6 +71,16 @@ void Game::draw()
 	this->buildRenderer->drawProp(Building(0, 0, Mine), 500, 10, 1001);
 	this->buildRenderer->drawProp(Building(0, 0, Depot), 550, 10, 1001);
 	this->buildRenderer->drawProp(Building(0, 0, Factory), 600, 10, 1001);
+
+	int* res = this->asteroids[activeAsteroid]->getRessources();
+	this->resRenderer->draw(400, 50, 1001, Ore);
+	this->smallFont->draw(boost::lexical_cast<std::wstring>(res[0]), 427, 53, 1001);
+
+	this->resRenderer->draw(500, 50, 1001, Uranium);
+	this->smallFont->draw(boost::lexical_cast<std::wstring>(res[1]), 527, 53, 1001);
+
+	this->resRenderer->draw(600, 50, 1001, Silicon);
+	this->smallFont->draw(boost::lexical_cast<std::wstring>(res[2]), 627, 53, 1001);
 	
 
 /*
@@ -81,7 +97,7 @@ void Game::draw()
 			Gosu::Color c2 = c1;
 			c2.setAlpha(120);
 
-			graphics->drawLine(this->lineStart->x - this->gamemap->x + 120, this->lineStart->y - this->gamemap->y + 120, c2, (int)input->mouseX(), (int)input->mouseY(), c1, 11);	
+			graphics->drawLine(this->lineStart->x - this->gamemap->x + this->asteroids[activeAsteroid]->x + 20, this->lineStart->y - this->gamemap->y + this->asteroids[activeAsteroid]->y + 20, c2, (int)input->mouseX(), (int)input->mouseY(), c1, 11);	
 		}
 	}
 
@@ -92,15 +108,41 @@ void Game::update()
 {
 	this->gamemap->update();
 
-	for(vector<Asteroid*>::iterator it = this->asteroids.begin(); it != this->asteroids.end(); ++it)
+	for(int i = 0; i < this->asteroids.size(); i++)
 	{
-		(*it)->update();
+		this->asteroids[i]->update();
+
+		// check which asteroid
+
+		
+		int mX = (int)input->mouseX() + this->gamemap->x;
+		int mY = (int)input->mouseY() + this->gamemap->y;
+		if(mX > this->asteroids[i]->x && mX < this->asteroids[i]->w+this->asteroids[i]->x &&
+		   mY > this->asteroids[i]->y && mY < this->asteroids[i]->h+this->asteroids[i]->y)
+		{
+			activeAsteroid = i;
+		}
 	}
 
-	if(input->down(Gosu::kbLeft)) gamemap->x -= 5;
-	if(input->down(Gosu::kbRight)) gamemap->x += 5;
-	if(input->down(Gosu::kbUp)) gamemap->y -= 5;
-	if(input->down(Gosu::kbDown)) gamemap->y += 5;
+	/*for(vector<Asteroid*>::iterator it = this->asteroids.begin(); it != this->asteroids.end(); ++it)
+	{
+		(*it)->update();
+
+		// check which asteroid
+
+		int mX = (int)input->mouseX();
+		int mY = (int)input->mouseY();
+		if(mX > (*it)->x && mX < (*it)->w && mY > (*it)->y && mY < (*it)->h)
+		{
+			activeAsteroid = 
+		}
+		
+	}*/
+
+	if(input->down(Gosu::kbLeft)) gamemap->x -= 10;
+	if(input->down(Gosu::kbRight)) gamemap->x += 10;
+	if(input->down(Gosu::kbUp)) gamemap->y -= 10;
+	if(input->down(Gosu::kbDown)) gamemap->y += 10;
 
 	if(gamemap->x < 0) gamemap->x = 0;
 	if(gamemap->y < 0) gamemap->y = 0;
@@ -177,12 +219,12 @@ void Game::buttonDown(Gosu::Button button)
 			
 			if(this->playState == PlaceBuilding)
 			{
-				this->asteroids[0]->placeBuilding((int)input->mouseX()-this->asteroids[0]->x - 20, (int)input->mouseY()-this->asteroids[0]->y - 20, this->placingBuilding);
+				this->asteroids[activeAsteroid]->placeBuilding((int)input->mouseX()-this->asteroids[activeAsteroid]->x - 20 + this->gamemap->x, (int)input->mouseY()-this->asteroids[activeAsteroid]->y - 20 + this->gamemap->y, this->placingBuilding);
 			}
 
 			if(this->playState == PlaceEnergyline || this->playState == PlaceTransportline)
 			{
-				Building* clickedBuilding = this->asteroids[0]->getBuildingAt((int)input->mouseX(), (int)input->mouseY(), this->gamemap->x, this->gamemap->y);
+				Building* clickedBuilding = this->asteroids[activeAsteroid]->getBuildingAt((int)input->mouseX(), (int)input->mouseY(), this->gamemap->x, this->gamemap->y);
 				if(clickedBuilding != 0)
 				{
 					if(this->lineStart == 0)
@@ -196,10 +238,10 @@ void Game::buttonDown(Gosu::Button button)
 					{
 						if(clickedBuilding->type == EnergyCollector) return;
 
-						Line* newLine = new Line(graphics, (this->playState == PlaceEnergyline ? 0 : 1));
+						Line* newLine = new Line(graphics, resRenderer, (this->playState == PlaceEnergyline ? 0 : 1));
 						newLine->start = lineStart;
 						newLine->end = clickedBuilding;
-						this->asteroids[0]->addLine(newLine);
+						this->asteroids[activeAsteroid]->addLine(newLine);
 						lineStart = 0;
 					}
 				}
