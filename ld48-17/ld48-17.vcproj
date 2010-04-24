@@ -175,10 +175,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Building.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Game.cpp"
 				>
 			</File>
@@ -202,6 +198,10 @@
 			</File>
 			<File
 				RelativePath=".\Building.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BuildingRenderer.hpp"
 				>
 			</File>
 			<File
@@ -230,6 +230,14 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+		</Filter>
+		<Filter
+			Name="Shader Files"
+			>
+			<File
+				RelativePath="..\Data\shader\ressourceArea.frag"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

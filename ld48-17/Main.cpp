@@ -9,7 +9,6 @@ class GosuWindow : public Gosu::Window
 	private:
 		Gosu::Font *font;
 
-		Gosu::Image* cursor;
 
 		Game* game;
 
@@ -22,7 +21,6 @@ class GosuWindow : public Gosu::Window
 
 			this->font = new Gosu::Font(graphics(), Gosu::defaultFontName(), 18);
 
-			this->cursor = new Gosu::Image(graphics(), L"data/cursor.png");
 
 			this->game = new Game(&graphics(), &input());
 
@@ -32,7 +30,6 @@ class GosuWindow : public Gosu::Window
 		void draw()
 		{
 			this->game->draw();
-			this->cursor->draw(input().mouseX(), input().mouseY(), 9999);
 
 
 		}

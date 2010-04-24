@@ -3,6 +3,8 @@
 
 #include "Game.hpp"
 
+#include "BuildingRenderer.hpp"
+
 #include "Asteroid.hpp"
 #include "Map.hpp"
 
@@ -17,8 +19,11 @@ enum GameState
 enum PlayingState
 {
 	Normal,
-	PlacesBuilding
+	PlaceTransportline,
+	PlaceEnergyline,
+	PlaceBuilding
 };
+
 
 class Game
 {
@@ -28,8 +33,14 @@ class Game
 		Gosu::Font *smallFont;
 		Gosu::Font *bigFont;
 
+		Gosu::Image* cursor;
+
+		BuildingRenderer* buildRenderer;
+
 	public:
 		PlayingState playState;
+		BuildingType placingBuilding;
+
 		GameState gameState;
 
 		Map *gamemap;

@@ -4,21 +4,33 @@
 #include "Gosu.hpp"
 #include "Ressource.hpp"
 
+enum BuildingType
+{
+	EnergyCollector,
+	Mine,
+	Depot
+};
+
 class Building
 {
 	public:
 		
-		double type;
+		BuildingType type;
 
 		double x, y;
 		double energyIn, energyOut;
 		Ressource transportIn, transportOut;
 
-		Building(double x, double y)
-			: x(x), y(y)
+		Building(double x, double y, BuildingType type)
+			: x(x), y(y), type(type)
 		{
 
 		}
+
+		void update()
+		{
+			
+		};
 };
 
 

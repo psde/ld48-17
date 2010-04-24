@@ -3,17 +3,19 @@
 
 struct Point2D
 {
+	Point2D(double x, double y)
+		: x(x), y(y)
+	{ };
+
 	double x, y;
 };
 
 class RessourceArea
 {
-	private:
+	public:
 		int type;
 		double availableTons;
 		vector<Point2D> area;
-
-	public:
 };
 
 #endif
