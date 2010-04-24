@@ -46,6 +46,12 @@ void Game::draw()
 	bool testFree = this->asteroids[0]->isFree((int)input->mouseX()-120, (int)input->mouseY()-120);
 	this->smallFont->draw(L"free? " +  boost::lexical_cast<std::wstring>(testFree), 10, 60, 9999);
 
+	
+	RessourceArea* testArea = this->asteroids[0]->getRessourceAreaAt((int)input->mouseX()-100, (int)input->mouseY()-100);
+	int testAreaType = -1;
+	if(testArea != 0) testAreaType = testArea->type;
+	this->smallFont->draw(L"free? " +  boost::lexical_cast<std::wstring>(testAreaType), 10, 70, 9999);
+
 
 	// GUI:
 	Gosu::Color guiBackground(240, 50, 50, 50);
@@ -75,7 +81,7 @@ void Game::draw()
 			Gosu::Color c2 = c1;
 			c2.setAlpha(120);
 
-			graphics->drawLine(this->lineStart->x - this->gamemap->x, this->lineStart->y - this->gamemap->y, c2, (int)input->mouseX(), (int)input->mouseY(), c1, 11);	
+			graphics->drawLine(this->lineStart->x - this->gamemap->x + 120, this->lineStart->y - this->gamemap->y + 120, c2, (int)input->mouseX(), (int)input->mouseY(), c1, 11);	
 		}
 	}
 
@@ -181,13 +187,15 @@ void Game::buttonDown(Gosu::Button button)
 				{
 					if(this->lineStart == 0)
 					{
-						if(clickedBuilding->type == EnergyCollector)
+						if(clickedBuilding->type == EnergyCollector || (this->playState == PlaceTransportline && clickedBuilding->type != EnergyCollector) )
 						{
 							lineStart = clickedBuilding;
 						}
 					}
 					else
 					{
+						if(clickedBuilding->type == EnergyCollector) return;
+
 						Line* newLine = new Line(graphics, (this->playState == PlaceEnergyline ? 0 : 1));
 						newLine->start = lineStart;
 						newLine->end = clickedBuilding;

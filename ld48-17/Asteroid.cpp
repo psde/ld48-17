@@ -24,6 +24,7 @@ Asteroid::Asteroid(Gosu::Graphics* graphics, Gosu::Input* input, bool capturable
 	testRA->area.push_back(Point2D(317, 223));
 	testRA->area.push_back(Point2D(237, 165));
 	testRA->area.push_back(Point2D(178, 94));
+	testRA->area.push_back(Point2D(226, 052));
 	this->ressourceAreas.push_back(testRA);
 
 }
@@ -107,9 +108,43 @@ bool Asteroid::isFree(int x, int y)
 		return false;
 }
 
+bool Asteroid::isInsideRessourceArea(int x, int y, RessourceArea* curArea)
+{
+	for(int i = 0; i < curArea->area.size(); i++)
+	{
+		int fooLast = i-1;
+		if(i == 0) fooLast = curArea->area.size()-1;
+		Point2D last = curArea->area[fooLast];
+		Point2D cur = curArea->area[i];
+
+		double dx1 = x - last.x;
+		double dy1 = y - last.y;
+
+		double dx2 = cur.x - last.x;
+		double dy2 = cur.y - last.y;
+
+		if( (dx1*dy2) - (dx2 * dy1) > 0) 
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 RessourceArea* Asteroid::getRessourceAreaAt(int x, int y)
 {
-	return this->ressourceAreas[0];
+	for(vector<RessourceArea*>::iterator it = this->ressourceAreas.begin(); it != this->ressourceAreas.end(); ++it)
+	{
+		RessourceArea* curArea = (*it);
+		
+		if(this->isInsideRessourceArea(x, y, curArea))
+		{
+			return (*it);
+		}
+	}
+	return 0;
+
+	//return this->ressourceAreas[0];
 }
 
 void Asteroid::placeBuilding(int x, int y, BuildingType type)

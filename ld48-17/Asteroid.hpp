@@ -40,6 +40,7 @@ class Asteroid
 		Building* getBuildingAt(int x, int y, int scrollX, int scrollY);
 		void addLine(Line* l);
 
+		bool isInsideRessourceArea(int x, int y, RessourceArea* curArea);
 		RessourceArea* getRessourceAreaAt(int x, int y);
 };
 
