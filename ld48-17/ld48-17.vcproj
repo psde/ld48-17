@@ -179,6 +179,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Game.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Main.cpp"
 				>
 			</File>
@@ -198,6 +202,10 @@
 			</File>
 			<File
 				RelativePath=".\Building.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Game.hpp"
 				>
 			</File>
 			<File

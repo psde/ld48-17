@@ -1,5 +1,6 @@
 #include "Gosu.hpp"
-#include "Map.hpp"
+#include "Game.hpp"
+
 
 using namespace std;
 
@@ -7,7 +8,10 @@ class GosuWindow : public Gosu::Window
 {
 	private:
 		Gosu::Font *font;
-		Map *gamemap;
+
+		Gosu::Image* cursor;
+
+		Game* game;
 
 	public:
 		GosuWindow()
@@ -16,21 +20,31 @@ class GosuWindow : public Gosu::Window
 			setCaption(L"Space Islands!");
 			glewInit();
 
-			this->gamemap = new Map(&graphics());
+			this->font = new Gosu::Font(graphics(), Gosu::defaultFontName(), 18);
+
+			this->cursor = new Gosu::Image(graphics(), L"data/cursor.png");
+
+			this->game = new Game(&graphics(), &input());
+
+			//
 		}
 
 		void draw()
 		{
-			this->gamemap->draw();
+			this->game->draw();
+			this->cursor->draw(input().mouseX(), input().mouseY(), 9999);
+
+
 		}
 
 		void update()
 		{
-			this->gamemap->update();
+			this->game->update();
 		}
 
 		void buttonDown(Gosu::Button button)
 		{
+			this->game->buttonDown(button);
 			if(button == Gosu::kbEscape) close();
 		}
 };

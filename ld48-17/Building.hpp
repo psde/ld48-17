@@ -6,13 +6,19 @@
 
 class Building
 {
-	private:
+	public:
+		
+		double type;
+
 		double x, y;
 		double energyIn, energyOut;
 		Ressource transportIn, transportOut;
 
-	public:
+		Building(double x, double y)
+			: x(x), y(y)
+		{
 
+		}
 };
 
 

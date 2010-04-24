@@ -2,7 +2,6 @@
 #define MAP_HPP
 
 #include "Gosu.hpp"
-#include "Asteroid.hpp"
 
 class Map
 {
@@ -11,13 +10,10 @@ class Map
 
 		Gosu::Image* bg1;
 
-		double x, y;
-
-		vector<Asteroid*> asteroids;
-
 	public:
+		double x, y, size;
 
-		Map(Gosu::Graphics* graphics);
+		Map(Gosu::Graphics* graphics, double size);
 
 		void update();
 		void draw();
