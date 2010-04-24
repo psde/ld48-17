@@ -3,9 +3,9 @@
 
 enum RessourceType
 {
-	Ore,
-	Oil,
-	Crystals
+	Ore = 0,
+	Silicon = 1,
+	Uranium = 2
 };
 
 class Ressource

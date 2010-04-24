@@ -39,6 +39,8 @@ class Asteroid
 
 		Building* getBuildingAt(int x, int y, int scrollX, int scrollY);
 		void addLine(Line* l);
+
+		RessourceArea* getRessourceAreaAt(int x, int y);
 };
 
 #endif

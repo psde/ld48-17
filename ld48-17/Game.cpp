@@ -58,6 +58,7 @@ void Game::draw()
 	this->buildRenderer->drawProp(Building(0, 0, EnergyCollector), 450, 10, 1001);
 	this->buildRenderer->drawProp(Building(0, 0, Mine), 500, 10, 1001);
 	this->buildRenderer->drawProp(Building(0, 0, Depot), 550, 10, 1001);
+	this->buildRenderer->drawProp(Building(0, 0, Factory), 600, 10, 1001);
 	
 
 /*
@@ -117,7 +118,7 @@ void Game::buttonDown(Gosu::Button button)
 		if(x > 250 && x < 774 && y > 0 && y < 70)
 		{	
 			int selection = -1;
-			for(int i = 0; i < 6; i++)
+			for(int i = 0; i < 7; i++)
 			{
 				if(Gosu::distance(x, y, 325 + i*50, 25) < 30)
 				{
@@ -158,6 +159,11 @@ void Game::buttonDown(Gosu::Button button)
 					this->playState = PlaceBuilding;
 					this->placingBuilding = Depot;
 					break;
+
+				case 6:
+					this->playState = PlaceBuilding;
+					this->placingBuilding = Factory;
+					break;
 			};
 		}
 		else
@@ -175,7 +181,10 @@ void Game::buttonDown(Gosu::Button button)
 				{
 					if(this->lineStart == 0)
 					{
-						lineStart = clickedBuilding;
+						if(clickedBuilding->type == EnergyCollector)
+						{
+							lineStart = clickedBuilding;
+						}
 					}
 					else
 					{

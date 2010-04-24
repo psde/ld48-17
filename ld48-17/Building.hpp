@@ -3,12 +3,14 @@
 
 #include "Gosu.hpp"
 #include "Ressource.hpp"
+#include "RessourceArea.hpp"
 
 enum BuildingType
 {
 	EnergyCollector,
 	Mine,
-	Depot
+	Depot,
+	Factory
 };
 
 class Building
@@ -21,13 +23,40 @@ class Building
 		double energyIn, energyOut;
 		double energyRequirement, energySupplied;
 		Ressource transportIn, transportOut;
+		RessourceArea* area;
 		bool disabled;
 
-		Building(double x, double y, BuildingType type)
-			: x(x), y(y), type(type), energyIn(0), energyOut(0), energyRequirement(0), energySupplied(0), disabled(false)
+		int tick;
+		int maxTick;
+		int internalDepot[3];
+
+		Building(double x, double y, BuildingType type, RessourceArea* area = 0)
+			: x(x), y(y), type(type), energyIn(0), energyOut(-1), energyRequirement(-1), energySupplied(0), disabled(false), area(area), tick(0)
 		{
-			if(type == Mine) energyRequirement = 10;
+			this->internalDepot[0] = 0;
+			this->internalDepot[1] = 0;
+			this->internalDepot[2] = 0;
+
+			if(type == Mine) {
+				energyRequirement = 10;
+				if(this->area != 0)
+				{
+					switch(this->area->type)
+					{
+						case Ore:
+							this->maxTick = 200;
+						
+						case Silicon:
+							this->maxTick = 100;
+
+						case Uranium:
+							this->maxTick = 300;
+					}
+				}
+			}
+
 			if(type == Depot) energyRequirement = 2;
+			if(type == Factory) energyRequirement = 25;
 		}
 
 		void update()
@@ -36,22 +65,21 @@ class Building
 			{
 				energyOut = 20;
 			}
-			else
+			else if(type == Mine)
 			{
-				/*energySupplied = 0;
-
-				int dif = energyIn - energyRequirement;
-				if(dif < 0)
+				if(!disabled && energyIn == energyRequirement && this->area != 0)
 				{
-					energyOut = 0;
-					energySupplied -= energyIn;
+					if(this->area->availableTons > 0)
+					{
+						tick++;
+						if(tick == maxTick)
+						{
+							// ressource ready!
+							this->internalDepot[this->area->type]++;
+							tick = 0;
+						}
+					}
 				}
-				else
-				{
-					energySupplied = 0;
-					energyOut = dif;
-				}
-					*/
 			}
 		};
 };

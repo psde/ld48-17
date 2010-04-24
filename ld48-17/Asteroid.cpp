@@ -14,9 +14,9 @@ Asteroid::Asteroid(Gosu::Graphics* graphics, Gosu::Input* input, bool capturable
 
 	// Ressource-Area test:
 
-	RessourceArea* testRA = new RessourceArea();
+	RessourceArea* testRA = new RessourceArea(graphics);
 	testRA->availableTons = 100;
-	testRA->type = 1;
+	testRA->type = Uranium;
 	testRA->area.push_back(Point2D(226, 052));
 	testRA->area.push_back(Point2D(311, 075));
 	testRA->area.push_back(Point2D(357, 125));
@@ -26,13 +26,6 @@ Asteroid::Asteroid(Gosu::Graphics* graphics, Gosu::Input* input, bool capturable
 	testRA->area.push_back(Point2D(178, 94));
 	this->ressourceAreas.push_back(testRA);
 
-			/*glVertex2f(326, 152);
-		glVertex2f(411, 175);
-		glVertex2f(457, 225);
-		glVertex2f(471, 302);
-		glVertex2f(417, 323);
-		glVertex2f(337, 265);
-		glVertex2f(278, 194);*/
 }
 
 void Asteroid::draw(BuildingRenderer &buildRenderer, int scrollX, int scrollY)
@@ -44,24 +37,8 @@ void Asteroid::draw(BuildingRenderer &buildRenderer, int scrollX, int scrollY)
 	for(vector<RessourceArea*>::iterator it = this->ressourceAreas.begin(); it != this->ressourceAreas.end(); ++it)
 	{
 		RessourceArea* curRA = (*it);
-		
-		graphics->beginGL();
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ONE);
-
-		// TODO: color should fade to red
-		glColor4f(0.20f, 0.3f, 0.11f, 0.7f);
-
-		glBegin(GL_POLYGON);
-
-		for(vector<Point2D>::iterator itp = curRA->area.begin(); itp != curRA->area.end(); ++itp)
-		{
-			Point2D curPoint = (*itp);
-			glVertex2f(this->x + curPoint.x - scrollX, this->y + curPoint.y - scrollY);
-		}
-
-		glEnd();
+		curRA->draw(this->x - scrollX, this->y - scrollY);
 	}
 
 	// Draw all lines
@@ -94,6 +71,12 @@ void Asteroid::draw(BuildingRenderer &buildRenderer, int scrollX, int scrollY)
 
 void Asteroid::update()
 {
+	// Reset energy input
+	for(vector<Building*>::iterator it = this->buildings.begin(); it != this->buildings.end(); ++it)
+	{
+		(*it)->energyIn = 0;
+	}
+
 	for(vector<Line*>::iterator it = this->lines.begin(); it != this->lines.end(); ++it)
 	{
 		(*it)->update();
@@ -124,11 +107,20 @@ bool Asteroid::isFree(int x, int y)
 		return false;
 }
 
+RessourceArea* Asteroid::getRessourceAreaAt(int x, int y)
+{
+	return this->ressourceAreas[0];
+}
+
 void Asteroid::placeBuilding(int x, int y, BuildingType type)
 {
 	if(this->isFree(x, y))
 	{
-		Building* test = new Building(x, y, type);
+		RessourceArea* tmpRA = this->getRessourceAreaAt(x, y);
+		
+		if(type == Mine && tmpRA == 0) return;
+
+		Building* test = new Building(x, y, type, tmpRA);
 		this->buildings.push_back(test);
 	}
 }
