@@ -171,7 +171,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\Asteroid.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Building.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Main.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Map.cpp"
 				>
 			</File>
 		</Filter>
@@ -181,7 +193,27 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\Asteroid.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Building.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Gosu.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Map.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Ressource.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RessourceArea.hpp"
 				>
 			</File>
 		</Filter>

@@ -14,8 +14,12 @@
 #include <list>
 #include <math.h>
 
+#include <vector>
+
 #include <GosuEx/Shader/Shader.hpp>
 
+
 using namespace std;
+
 
 #endif
