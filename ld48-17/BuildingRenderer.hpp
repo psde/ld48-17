@@ -28,7 +28,7 @@ class BuildingRenderer
 			this->smallFont = new Gosu::Font(*graphics, Gosu::defaultFontName(), 12);
 		};
 
-		void draw(Building &build, int x, int y, int z, bool hovering, int status=0)
+		void draw(Building* build, int x, int y, int z, bool hovering, int status=0)
 		{
 			Gosu::Color c = Gosu::Colors::white;
 
@@ -36,7 +36,8 @@ class BuildingRenderer
 			if(status == 2) c = Gosu::Colors::green;
 
 			this->backdrop->draw(x, y, z, 1, 1, c);
-			switch(build.type)
+			z++;
+			switch(build->type)
 			{
 				case EnergyCollector:
 					this->energy->draw(x, y, z, 1, 1, c);
@@ -57,15 +58,36 @@ class BuildingRenderer
 				Gosu::Color guiBackgroundFade(130, 50, 50, 50);
 
 				graphics->drawQuad(x+50, y, guiBackground, x+200, y, guiBackground, x+50, y+200, guiBackgroundFade, x+200, y+200, guiBackgroundFade, 1010);
-				this->smallFont->draw(L"Type: " + boost::lexical_cast<std::wstring>(build.type),x+60, y+10, 1011);
-				this->smallFont->draw(L"Energy Sup: " + boost::lexical_cast<std::wstring>(build.energySupplied),x+60, y+20, 1011);
-				this->smallFont->draw(L"Energy Req: " + boost::lexical_cast<std::wstring>(build.energyRequirement),x+60, y+30, 1011);
-				this->smallFont->draw(L"Energy In: " + boost::lexical_cast<std::wstring>(build.energyIn),x+60, y+40, 1011);
-				this->smallFont->draw(L"Energy Out: " + boost::lexical_cast<std::wstring>(build.energyOut),x+60, y+50, 1011);
-				this->smallFont->draw(L"Transport In: " + boost::lexical_cast<std::wstring>(build.transportIn.type),x+60, y+60, 1011);
-				this->smallFont->draw(L"Transport Out: " + boost::lexical_cast<std::wstring>(build.transportOut.type),x+60, y+70, 1011);
+				this->smallFont->draw(L"Type: " + boost::lexical_cast<std::wstring>(build->type),x+60, y+10, 1011);
+				this->smallFont->draw(L"Energy Sup: " + boost::lexical_cast<std::wstring>(build->energySupplied),x+60, y+20, 1011);
+				this->smallFont->draw(L"Energy Req: " + boost::lexical_cast<std::wstring>(build->energyRequirement),x+60, y+30, 1011);
+				this->smallFont->draw(L"Energy In: " + boost::lexical_cast<std::wstring>(build->energyIn),x+60, y+40, 1011);
+				this->smallFont->draw(L"Energy Out: " + boost::lexical_cast<std::wstring>(build->energyOut),x+60, y+50, 1011);
+				this->smallFont->draw(L"Transport In: " + boost::lexical_cast<std::wstring>(build->transportIn.type),x+60, y+60, 1011);
+				this->smallFont->draw(L"Transport Out: " + boost::lexical_cast<std::wstring>(build->transportOut.type),x+60, y+70, 1011);
 
 			}
+		}
+
+		void drawProp(Building& build, int x, int y, int z)
+		{
+			Gosu::Color c = Gosu::Colors::white;
+
+
+			this->backdrop->draw(x, y, z, 1, 1, c);
+			z++;
+			switch(build.type)
+			{
+				case EnergyCollector:
+					this->energy->draw(x, y, z, 1, 1, c);
+					break;
+				case Mine:
+					this->mine->draw(x, y, z, 1, 1, c);
+					break;
+				case Depot:
+					this->depot->draw(x, y, z, 1, 1, c);
+					break;
+			};
 		}
 
 };

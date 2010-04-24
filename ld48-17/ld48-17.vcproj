@@ -213,6 +213,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Line.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Map.hpp"
 				>
 			</File>

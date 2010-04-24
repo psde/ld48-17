@@ -5,6 +5,8 @@
 #include "BuildingRenderer.hpp"
 #include "RessourceArea.hpp"
 #include "Building.hpp"
+#include "Line.hpp"
+
 
 class Asteroid
 {
@@ -17,8 +19,10 @@ class Asteroid
 		Gosu::Bitmap buildMap;
 
 
-		vector<RessourceArea> ressourceAreas;
-		vector<Building> buildings;
+		vector<RessourceArea*> ressourceAreas;
+		vector<Building*> buildings;
+
+		vector<Line*> lines;
 
 	public:
 		const bool capturable;
@@ -32,6 +36,9 @@ class Asteroid
 
 		bool isFree(int x, int y);
 		void placeBuilding(int x, int y, BuildingType type);
+
+		Building* getBuildingAt(int x, int y, int scrollX, int scrollY);
+		void addLine(Line* l);
 };
 
 #endif

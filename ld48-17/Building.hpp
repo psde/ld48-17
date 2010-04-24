@@ -21,9 +21,10 @@ class Building
 		double energyIn, energyOut;
 		double energyRequirement, energySupplied;
 		Ressource transportIn, transportOut;
+		bool disabled;
 
 		Building(double x, double y, BuildingType type)
-			: x(x), y(y), type(type), energyIn(0), energyOut(0), energyRequirement(0), energySupplied(0)
+			: x(x), y(y), type(type), energyIn(0), energyOut(0), energyRequirement(0), energySupplied(0), disabled(false)
 		{
 			if(type == Mine) energyRequirement = 10;
 			if(type == Depot) energyRequirement = 2;
@@ -34,8 +35,10 @@ class Building
 			if(type == EnergyCollector)
 			{
 				energyOut = 20;
-			}else{
-				energySupplied = 0;
+			}
+			else
+			{
+				/*energySupplied = 0;
 
 				int dif = energyIn - energyRequirement;
 				if(dif < 0)
@@ -48,7 +51,7 @@ class Building
 					energySupplied = 0;
 					energyOut = dif;
 				}
-					
+					*/
 			}
 		};
 };

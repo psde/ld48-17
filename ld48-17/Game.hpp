@@ -37,6 +37,9 @@ class Game
 
 		BuildingRenderer* buildRenderer;
 
+		Building* lineStart;
+		Asteroid* lineAsteroid;
+
 	public:
 		PlayingState playState;
 		BuildingType placingBuilding;

@@ -7,15 +7,23 @@ Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
 	this->cursor = new Gosu::Image(*graphics, L"data/cursor.png");
 
 	this->buildRenderer = new BuildingRenderer(graphics);
+	this->lineStart = 0;
 
 	this->smallFont = new Gosu::Font(*graphics, Gosu::defaultFontName(), 14);
 	this->bigFont = new Gosu::Font(*graphics, Gosu::defaultFontName(), 22);
 
-	for(int i = 0; i < 1; i++)
+	/*for(int i = 0; i < 1; i++)
 	{
 		Asteroid* newAsteroid = new Asteroid(graphics, input, true, 100, 100, 1);
 		this->asteroids.push_back(newAsteroid);
-	}
+	}*/
+
+	Asteroid* newAsteroid1 = new Asteroid(graphics, input, true, 100, 100, 1);
+	this->asteroids.push_back(newAsteroid1);
+
+	Asteroid* newAsteroid2 = new Asteroid(graphics, input, true, 600, 250, 1);
+	this->asteroids.push_back(newAsteroid2);
+
 	this->gamemap = new Map(graphics, 1000);
 	this->playState = Normal;
 }
@@ -47,9 +55,9 @@ void Game::draw()
 	this->cursor->draw(320, 20, 1001);
 	graphics->drawLine(360, 20, Gosu::Colors::aqua, 380, 40, Gosu::Colors::aqua, 1001);
 	graphics->drawLine(410, 20, Gosu::Colors::red, 430, 40, Gosu::Colors::red, 1001);
-	this->buildRenderer->draw(Building(0, 0, EnergyCollector), 450, 10, 1001, false);
-	this->buildRenderer->draw(Building(0, 0, Mine), 500, 10, 1001, false);
-	this->buildRenderer->draw(Building(0, 0, Depot), 550, 10, 1001, false);
+	this->buildRenderer->drawProp(Building(0, 0, EnergyCollector), 450, 10, 1001);
+	this->buildRenderer->drawProp(Building(0, 0, Mine), 500, 10, 1001);
+	this->buildRenderer->drawProp(Building(0, 0, Depot), 550, 10, 1001);
 	
 
 /*
@@ -57,7 +65,20 @@ void Game::draw()
 	static GosuEx::ShaderProgram program = local.compile(L"data/shader/ressourceArea.frag");
 */
 
-	this->cursor->draw(input->mouseX(), input->mouseY(), 9999);
+	if(this->playState == PlaceEnergyline || this->playState == PlaceTransportline)
+	{
+		if(this->lineStart != 0)
+		{
+			Gosu::Color c1 = Gosu::Colors::red;
+			if(this->playState == PlaceTransportline) c1 = Gosu::Colors::aqua;
+			Gosu::Color c2 = c1;
+			c2.setAlpha(120);
+
+			graphics->drawLine(this->lineStart->x - this->gamemap->x, this->lineStart->y - this->gamemap->y, c2, (int)input->mouseX(), (int)input->mouseY(), c1, 11);	
+		}
+	}
+
+	this->cursor->draw((int)input->mouseX(), (int)input->mouseY(), 9999);
 }
 
 void Game::update()
@@ -82,6 +103,11 @@ void Game::update()
 
 void Game::buttonDown(Gosu::Button button)
 {
+	if(button == Gosu::msRight)
+	{
+		this->playState = Normal;
+	}
+
 	if(button == Gosu::msLeft)
 	{
 		// check if inside of gui
@@ -110,10 +136,12 @@ void Game::buttonDown(Gosu::Button button)
 
 				case 1:
 					this->playState = PlaceTransportline;
+					this->lineStart = 0;
 					break;
 
 				case 2:
 					this->playState = PlaceEnergyline;
+					this->lineStart = 0;
 					break;
 
 				case 3:
@@ -138,6 +166,26 @@ void Game::buttonDown(Gosu::Button button)
 			if(this->playState == PlaceBuilding)
 			{
 				this->asteroids[0]->placeBuilding((int)input->mouseX()-this->asteroids[0]->x - 20, (int)input->mouseY()-this->asteroids[0]->y - 20, this->placingBuilding);
+			}
+
+			if(this->playState == PlaceEnergyline || this->playState == PlaceTransportline)
+			{
+				Building* clickedBuilding = this->asteroids[0]->getBuildingAt((int)input->mouseX(), (int)input->mouseY(), this->gamemap->x, this->gamemap->y);
+				if(clickedBuilding != 0)
+				{
+					if(this->lineStart == 0)
+					{
+						lineStart = clickedBuilding;
+					}
+					else
+					{
+						Line* newLine = new Line(graphics, (this->playState == PlaceEnergyline ? 0 : 1));
+						newLine->start = lineStart;
+						newLine->end = clickedBuilding;
+						this->asteroids[0]->addLine(newLine);
+						lineStart = 0;
+					}
+				}
 			}
 
 		}
