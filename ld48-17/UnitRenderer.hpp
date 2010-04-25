@@ -1,0 +1,67 @@
+#ifndef UNITRENDERER_HPP
+#define UNITRENDERER_HPP
+
+
+#include "Gosu.hpp"
+#include "Unit.hpp"
+
+class UnitRenderer
+{
+	public:
+		Gosu::Graphics* graphics;
+		Gosu::Image* backdrop;
+		Gosu::Image* backdrop_white;
+		Gosu::Image* scout;
+		Gosu::Image* colo;
+
+
+
+		UnitRenderer(Gosu::Graphics* graphics)
+			: graphics(graphics)
+		{
+			this->backdrop = new Gosu::Image(*graphics, L"data/units/backdrop.png");
+			this->backdrop_white = new Gosu::Image(*graphics, L"data/units/backdrop_white.png");
+			this->scout = new Gosu::Image(*graphics, L"data/units/scout.png");
+			this->colo = new Gosu::Image(*graphics, L"data/units/colo.png");
+		}
+
+		void drawUnit(int x, int y, int z, Unit* unit, bool selected=false)
+		{
+			if(selected)
+			{
+				this->backdrop_white->draw(x, y, z, 1, 1, Gosu::Colors::cyan);
+
+				// show targetX/targetY
+				int fX = x - unit->x;
+				int fY = y - unit->y;
+				this->graphics->drawLine(x+20, y+20, Gosu::Colors::white, fX - unit->targetX, fY - unit->targetY, Gosu::Colors::white, z);
+			}
+			else
+			{
+				switch(unit->order)
+				{
+					case DoNothing:
+						this->backdrop->draw(x, y, z);
+						break;
+
+					case DoMove:
+						this->backdrop_white->draw(x, y, z, 1, 1, Gosu::Colors::green);
+						break;
+				}
+			}
+
+			switch(unit->type)
+			{
+				case Scout:
+					this->scout->draw(x, y, z+1);
+					break;
+
+				case Colo:
+					this->colo->draw(x, y, z+1);
+					break;
+			}
+		}
+
+};
+
+#endif

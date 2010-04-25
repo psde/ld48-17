@@ -25,7 +25,7 @@ class RessourceArea
 		double availableTons;
 		vector<Point2D> area;
 
-		void draw(int x, int y, bool hover=false)
+		void draw(int x, int y, bool hover=false, int mX=0, int mY=0)
 		{
 			graphics->beginGL();
 
@@ -54,6 +54,15 @@ class RessourceArea
 			}
 
 			glEnd();
+
+			if(hover)
+			{
+				Gosu::Color guiBackground(240, 50, 50, 50);
+				Gosu::Color guiBackgroundFade(130, 50, 50, 50);
+
+				graphics->drawQuad(mX+50, mY, guiBackground, mX+200, mY, guiBackground, mX+50, mY+200, guiBackgroundFade, mX+200, mY+200, guiBackgroundFade, 1010);
+			}
+
 		}
 };
 

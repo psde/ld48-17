@@ -10,12 +10,35 @@ enum BuildingType
 	EnergyCollector,
 	Mine,
 	Depot,
-	Factory
+	Factory,
+	Spaceport
 };
+
 
 class Building
 {
 	public:
+
+		static int getBuildingType(BuildingType type)
+		{
+			switch(type)
+			{
+				case EnergyCollector:
+					return 0;
+
+				case Mine:
+					return 1;
+
+				case Depot:
+					return 2;
+
+				case Factory:
+					return 3;
+
+				case Spaceport:
+					return 4;
+			}
+		}
 		
 		BuildingType type;
 
@@ -30,6 +53,10 @@ class Building
 		int maxTick;
 		int internalDepot[3];
 		int wantsRes[3];
+
+		// factory
+
+
 
 		Building(double x, double y, BuildingType type, RessourceArea* area = 0)
 			: x(x), y(y), type(type), energyIn(0), energyOut(-1), energyRequirement(-1), energySupplied(0), disabled(false), area(area), tick(0)
@@ -71,7 +98,12 @@ class Building
 			if(type == Factory)
 			{
 				energyRequirement = 25;
-				this->wantsRes[2] = 10;
+				this->wantsRes[2] = 10; // testing only
+			}
+
+			if(type == Spaceport)
+			{
+				energyRequirement = 75;
 			}
 		}
 

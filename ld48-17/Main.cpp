@@ -1,3 +1,11 @@
+
+// FUCK DIS SHIT
+// next time I will try ruby
+// c++ fuckage
+
+
+
+
 #include "Gosu.hpp"
 #include "Game.hpp"
 
@@ -43,6 +51,11 @@ class GosuWindow : public Gosu::Window
 		{
 			this->game->buttonDown(button);
 			if(button == Gosu::kbEscape) close();
+		}
+
+		void buttonUp(Gosu::Button button)
+		{
+			this->game->buttonUp(button);
 		}
 };
 

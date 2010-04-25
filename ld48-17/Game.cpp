@@ -1,13 +1,14 @@
 #include "Game.hpp"
 
 Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
-: graphics(graphics), input(input)
+: graphics(graphics), input(input), selectStart(0, 0), selecting(false)
 {
 
 	this->cursor = new Gosu::Image(*graphics, L"data/cursor.png");
 
 	this->buildRenderer = new BuildingRenderer(graphics);
 	this->resRenderer = new RessourceRenderer(graphics);
+	this->unitRenderer = new UnitRenderer(graphics);
 	this->lineStart = 0;
 
 	this->smallFont = new Gosu::Font(*graphics, Gosu::defaultFontName(), 14);
@@ -19,15 +20,34 @@ Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
 		this->asteroids.push_back(newAsteroid);
 	}*/
 
-	Asteroid* newAsteroid1 = new Asteroid(graphics, input, resRenderer, true, 100, 100, 1, true);
+	Asteroid* newAsteroid1 = new Asteroid(graphics, input, resRenderer, true, 500, 300, 1, true);
 	this->asteroids.push_back(newAsteroid1);
 
-	Asteroid* newAsteroid2 = new Asteroid(graphics, input, resRenderer, true, 600, 250, 1);
+	Asteroid* newAsteroid2 = new Asteroid(graphics, input, resRenderer, true, 1500, 2050, 1);
 	this->asteroids.push_back(newAsteroid2);
 
-	this->gamemap = new Map(graphics, 1000);
+	this->gamemap = new Map(graphics, 5000);
 	this->playState = Normal;
 	this->activeAsteroid = 0;
+
+	Unit* testUnit1 = new Unit(200, 200, Scout);
+	this->units.push_back(testUnit1);
+
+	Unit* testUnit2 = new Unit(250, 200, Scout);
+	this->units.push_back(testUnit2);
+
+	Unit* testUnit3 = new Unit(350, 350, Scout);
+	this->units.push_back(testUnit3);
+}
+
+bool Game::isUnitSelected(Unit* unit)
+{
+	for(vector<Unit*>::iterator it = this->selectedUnits.begin(); it != this->selectedUnits.end(); ++it)
+	{
+		Unit* curUnit = (*it);
+		if(curUnit == unit) return true;
+	}
+	return false;
 }
 
 void Game::draw()
@@ -37,6 +57,12 @@ void Game::draw()
 	for(vector<Asteroid*>::iterator it = this->asteroids.begin(); it != this->asteroids.end(); ++it)
 	{
 		(*it)->draw(*this->buildRenderer, (int)gamemap->x, (int)gamemap->y);
+	}
+
+	for(vector<Unit*>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+	{
+		Unit* curUnit = (*it);
+		this->unitRenderer->drawUnit(curUnit->x - gamemap->x, curUnit->y - gamemap->y, 50, curUnit, isUnitSelected(curUnit));
 	}
 
 	this->smallFont->draw(L"mx: " +  boost::lexical_cast<std::wstring>(input->mouseX()), 10, 10, 9999);
@@ -71,6 +97,7 @@ void Game::draw()
 	this->buildRenderer->drawProp(Building(0, 0, Mine), 500, 10, 1001);
 	this->buildRenderer->drawProp(Building(0, 0, Depot), 550, 10, 1001);
 	this->buildRenderer->drawProp(Building(0, 0, Factory), 600, 10, 1001);
+	this->buildRenderer->drawProp(Building(0, 0, Spaceport), 650, 10, 1001);
 
 	int* res = this->asteroids[activeAsteroid]->getRessources();
 	this->resRenderer->draw(400, 50, 1001, Ore);
@@ -102,6 +129,13 @@ void Game::draw()
 	}
 
 	this->cursor->draw((int)input->mouseX(), (int)input->mouseY(), 9999);
+
+	if(this->playState == Normal && this->selecting)
+	{
+		Gosu::Color c(120, 255, 255, 255);
+		graphics->drawQuad(this->selectStart.x - gamemap->x, this->selectStart.y - gamemap->y, c, (int)input->mouseX(), this->selectStart.y - gamemap->y, c,
+						   this->selectStart.x - gamemap->x, (int)input->mouseY(), c, (int)input->mouseX(), (int)input->mouseY(), c, 9998); 
+	}
 }
 
 void Game::update()
@@ -139,6 +173,11 @@ void Game::update()
 		
 	}*/
 
+	for(int i = 0; i < this->units.size(); i++)
+	{
+		this->units[i]->update();
+	}
+
 	if(input->down(Gosu::kbLeft)) gamemap->x -= 10;
 	if(input->down(Gosu::kbRight)) gamemap->x += 10;
 	if(input->down(Gosu::kbUp)) gamemap->y -= 10;
@@ -155,6 +194,7 @@ void Game::buttonDown(Gosu::Button button)
 	if(button == Gosu::msRight)
 	{
 		this->playState = Normal;
+		this->selectedUnits.clear();
 	}
 
 	if(button == Gosu::msLeft)
@@ -166,7 +206,7 @@ void Game::buttonDown(Gosu::Button button)
 		if(x > 250 && x < 774 && y > 0 && y < 70)
 		{	
 			int selection = -1;
-			for(int i = 0; i < 7; i++)
+			for(int i = 0; i < 8; i++)
 			{
 				if(Gosu::distance(x, y, 325 + i*50, 25) < 30)
 				{
@@ -212,10 +252,24 @@ void Game::buttonDown(Gosu::Button button)
 					this->playState = PlaceBuilding;
 					this->placingBuilding = Factory;
 					break;
+
+				case 7:
+					this->playState = PlaceBuilding;
+					this->placingBuilding = Spaceport;
+					break;
 			};
 		}
 		else
 		{
+
+			if(this->playState == Normal)
+			{
+				this->selectedUnits.clear();
+				this->selecting = true;
+				this->selectStart = Point2D((int)input->mouseX() + this->gamemap->x, (int)input->mouseY() + this->gamemap->y);
+			}else{
+				this->selecting = false;
+			}
 			
 			if(this->playState == PlaceBuilding)
 			{
@@ -247,6 +301,58 @@ void Game::buttonDown(Gosu::Button button)
 				}
 			}
 
+		}
+	}
+}
+
+void Game::buttonUp(Gosu::Button button)
+{
+	if(button == Gosu::msLeft)
+	{
+		if(this->playState == Normal && this->selecting)
+		{
+			this->selecting = false;
+
+			int sX = this->selectStart.x;
+			int sY = this->selectStart.y;
+			int eX = gamemap->x + (int)input->mouseX();
+			int eY = gamemap->y + (int)input->mouseY();
+
+			if(sX > eX)
+			{
+				int tmp = sX;
+				sX = eX;
+				eX = tmp;
+			}
+
+			if(sY > eY)
+			{
+				int tmp = sY;
+				sY = eY;
+				eY = tmp;
+			}
+
+			for(vector<Unit*>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+			{
+				Unit* curUnit = (*it);
+				
+/*
+		graphics->drawQuad(this->selectStart.x - gamemap->x, this->selectStart.y - gamemap->y, c, (int)input->mouseX(), this->selectStart.y - gamemap->y, c,
+						   this->selectStart.x - gamemap->x, (int)input->mouseY(), c, (int)input->mouseX(), (int)input->mouseY(), c, 9998); 
+		*/
+				int x = curUnit->x+20;
+				int y = curUnit->y+20;
+				
+
+				cout << sX << " " << eX << endl;
+
+				if(x > sX && x < eX && y > sY && y < eY)
+				{
+					this->selectedUnits.push_back((*it));
+				}
+			}
+
+			// bounding box fun?
 		}
 	}
 }

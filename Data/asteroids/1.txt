@@ -21,8 +21,8 @@ ressourcePoint=212,401
 
 ressourceType=2
 ressourceTons=25
-ressourcePoint=345,271
-ressourcePoint=379,251
+ressourcePoint=310,281
+ressourcePoint=349,241
 ressourcePoint=392,265
 ressourcePoint=379,291
-ressourcePoint=353,299
+ressourcePoint=339,319

@@ -1,9 +1,17 @@
 #include "Asteroid.hpp"
 
+const int BuildingCosts[5][3] = {{5, 15, 0}, // EnergyCollector
+						   {25, 5, 0}, // Mine
+						   {10, 10, 0}, // Depot
+						   {40, 25, 15}, // Factory
+						   {45, 40, 30}}; // spaceport
+
 
 Asteroid::Asteroid(Gosu::Graphics* graphics,  Gosu::Input* input, RessourceRenderer* resRenderer, bool capturable, double x, double y, int type, bool start)
-: graphics(graphics), input(input), resRenderer(resRenderer), capturable(capturable), x(x), y(y), hover(0), maxHover(15)
+: graphics(graphics), input(input), resRenderer(resRenderer), capturable(capturable), x(x), y(y), hover(0), maxHover(30), scouted(false)
 {
+	if(start) scouted = true;
+
 	this->img = new Gosu::Image(*graphics, L"data/asteroids/" + boost::lexical_cast<std::wstring>(type) + L".png");
 	this->w = this->img->width();
 	this->h = this->img->height();
@@ -140,39 +148,71 @@ void Asteroid::draw(BuildingRenderer &buildRenderer, int scrollX, int scrollY)
 	this->img->draw(this->x - scrollX, this->y - scrollY, 10);
 	//this->imgBuildMap->draw(this->x, this->y, 10); // Debug: Draw "hitmap" for buildable areas
 
+	bool raHover = false;
 	// Draw ressource areas
 	for(vector<RessourceArea*>::iterator it = this->ressourceAreas.begin(); it != this->ressourceAreas.end(); ++it)
 	{
+		if(!scouted) break;
+
 		RessourceArea* curRA = (*it);
 
-		curRA->draw(this->x - scrollX, this->y - scrollY);
+		bool hovering = false;
+		if(isInsideRessourceArea((int)input->mouseX()-this->x  + scrollX, (int)input->mouseY()-this->y  + scrollY, (*it)))
+		{
+			raHover = true;
+			this->hover++;
+			if(this->hover >= this->maxHover)
+			{
+				hovering = true;
+			}
+		}
+
+		curRA->draw(this->x - scrollX, this->y - scrollY, hovering, (int)input->mouseX(), (int)input->mouseY());
 	}
 
 	// Draw all lines
-	for(vector<Line*>::iterator it = this->lines.begin(); it != this->lines.end(); ++it)
+	for(vector<Line*>::iterator it = this->powerlines.begin(); it != this->powerlines.end(); ++it)
+	{
+		Line* curLine = (*it);
+
+		curLine->draw(this->x - scrollX + 20, this->y - scrollY + 20);
+	}	
+	for(vector<Line*>::iterator it = this->transportlines.begin(); it != this->transportlines.end(); ++it)
 	{
 		Line* curLine = (*it);
 
 		curLine->draw(this->x - scrollX + 20, this->y - scrollY + 20);
 	}
 
+	bool buildHover = false;
 	// Draw all buildings
 	for(vector<Building*>::iterator it = this->buildings.begin(); it != this->buildings.end(); ++it)
 	{
 		Building* curBuild = (*it);
 
-		bool hover = false;
+		
+		bool hovering = false;
 		if(Gosu::distance(this->x + curBuild->x - scrollX + 20, this->y + curBuild->y - scrollY + 20, input->mouseX(), input->mouseY()) < 15) 
 		{
-			hover = true;
+			buildHover = true;
+			this->hover++;
+			if(this->hover >= this->maxHover)
+			{
+				hovering = true;
+			}
 		}
 
-		buildRenderer.draw(curBuild, this->x + curBuild->x - scrollX, this->y + curBuild->y - scrollY, 12, hover);
+
+		buildRenderer.draw(curBuild, this->x + curBuild->x - scrollX, this->y + curBuild->y - scrollY, 12, hovering);
 
 		/*this->buildingBackdrop->draw(this->x + curBuild.x - scrollX, this->y + curBuild.y - scrollY, 11);
 		this->buildingEnergy->draw(this->x + curBuild.x - scrollX, this->y + curBuild.y - scrollY, 12);*/
 	}
 
+	if(raHover == false && buildHover == false)
+	{
+		this->hover = 0;
+	}
 	
 }
 
@@ -184,7 +224,12 @@ void Asteroid::update()
 		(*it)->energyIn = 0;
 	}
 
-	for(vector<Line*>::iterator it = this->lines.begin(); it != this->lines.end(); ++it)
+	for(vector<Line*>::iterator it = this->powerlines.begin(); it != this->powerlines.end(); ++it)
+	{
+		(*it)->update();
+	}
+
+	for(vector<Line*>::iterator it = this->transportlines.begin(); it != this->transportlines.end(); ++it)
 	{
 		(*it)->update();
 	}
@@ -249,17 +294,18 @@ RessourceArea* Asteroid::getRessourceAreaAt(int x, int y)
 		}
 	}
 	return 0;
-
-	//return this->ressourceAreas[0];
 }
 
 void Asteroid::placeBuilding(int x, int y, BuildingType type)
 {
+	int buildType = Building::getBuildingType(type);
 	if(this->isFree(x, y))
 	{
 		RessourceArea* tmpRA = this->getRessourceAreaAt(x, y);
 		
 		if(type == Mine && tmpRA == 0) return;
+
+		if(!this->reduceRessources(BuildingCosts[buildType][0], BuildingCosts[buildType][1], BuildingCosts[buildType][2])) return;
 
 		Building* test = new Building(x, y, type, tmpRA);
 		this->buildings.push_back(test);
@@ -281,7 +327,14 @@ Building* Asteroid::getBuildingAt(int x, int y, int scrollX, int scrollY)
 
 void Asteroid::addLine(Line *l)
 {
-	this->lines.push_back(l);
+	if(l->type == 0)
+	{
+		this->powerlines.push_back(l);
+	}
+	else
+	{
+		this->transportlines.push_back(l);
+	}
 }
 
 int* Asteroid::getRessources()
@@ -301,6 +354,67 @@ int* Asteroid::getRessources()
 			foo[2] += curBuild->internalDepot[2];
 		}
 	}
+
+	return foo;
+}
+
+bool Asteroid::reduceRessources(int r1, int r2, int r3)
+{
+	int* res = this->getRessources();
+
+	if(res[0] < r1 || res[1] < r2 || res[2] < r3)
+	{
+		return false;
+	}
+
+	int* foo = new int[3];
+	foo[0] = r1;
+	foo[1] = r2;
+	foo[2] = r3;
+
+	for(vector<Building*>::iterator it = this->buildings.begin(); it != this->buildings.end(); ++it)
+	{
+		Building* curBuild = (*it);
+		if(curBuild->type == Depot)
+		{
+			for(int i=0; i<3; i++)
+			{
+				if(foo[i] > 0)
+				{
+					if(curBuild->internalDepot[i] > foo[i])
+					{
+						curBuild->internalDepot[i] -= foo[i];
+						foo[i] = 0;
+					}
+					else
+					{
+						int dif = foo[i] - curBuild->internalDepot[i];
+						curBuild->internalDepot[i] = 0;
+						foo[i] = dif;
+					}
+				}
+			}
+			
+			//foo[0] += curBuild->internalDepot[0];
+			//foo[1] += curBuild->internalDepot[1];
+			//foo[2] += curBuild->internalDepot[2];
+		}
+	}
+
+	return true;
+}
+
+int* Asteroid::getBuildingCost(BuildingType type)
+{
+	return this->getBuildingCost(Building::getBuildingType(type));
+}
+
+int* Asteroid::getBuildingCost(int type)
+{
+	int* foo = new int[3];
+	foo[0] = BuildingCosts[type][0];
+	foo[1] = BuildingCosts[type][1];
+	foo[2] = BuildingCosts[type][2];
 
 	return foo;
 }

@@ -24,13 +24,16 @@ class Asteroid
 		vector<RessourceArea*> ressourceAreas;
 		vector<Building*> buildings;
 
-		vector<Line*> lines;
+		vector<Line*> powerlines;
+		vector<Line*> transportlines;
 
 		int hover;
 		int maxHover;
 
+
 	public:
 		const bool capturable;
+		bool scouted;
 		double x, y, w, h;
 
 		Asteroid(Gosu::Graphics* graphics, Gosu::Input* input, RessourceRenderer* resRenderer, bool capturable, double x, double y, int type, bool start=false);
@@ -49,6 +52,11 @@ class Asteroid
 		RessourceArea* getRessourceAreaAt(int x, int y);
 
 		int* getRessources();
+		bool reduceRessources(int r1, int r2, int r3);
+
+		
+		int* getBuildingCost(BuildingType type);
+		int* getBuildingCost(int type);
 };
 
 #endif

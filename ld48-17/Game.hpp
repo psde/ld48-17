@@ -1,13 +1,16 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include "Game.hpp"
+
 
 #include "BuildingRenderer.hpp"
 #include "RessourceRenderer.hpp"
 
 #include "Asteroid.hpp"
 #include "Map.hpp"
+
+#include "Unit.hpp"
+#include "UnitRenderer.hpp"
 
 enum GameState
 {
@@ -38,6 +41,7 @@ class Game
 
 		BuildingRenderer* buildRenderer;
 		RessourceRenderer* resRenderer;
+		UnitRenderer* unitRenderer;
 
 		Building* lineStart;
 		Asteroid* lineAsteroid;
@@ -52,12 +56,21 @@ class Game
 
 		Map *gamemap;
 		vector<Asteroid*> asteroids;
+		vector<Unit*> units;
+		vector<Unit*> selectedUnits;
+		Point2D selectStart;
+		bool selecting;
 
 		Game(Gosu::Graphics* graphics, Gosu::Input* input);
 
 		void update();
 		void draw();
 		void buttonDown(Gosu::Button button);
+		void buttonUp(Gosu::Button button);
+
+
+		bool isUnitSelected(Unit* unit);
+
 };
 
 #endif

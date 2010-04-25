@@ -14,6 +14,7 @@ class BuildingRenderer
 		Gosu::Image* depot;
 		Gosu::Image* mine;
 		Gosu::Image* factory;
+		Gosu::Image* spaceport;
 
 		Gosu::Font* smallFont;
 
@@ -26,6 +27,8 @@ class BuildingRenderer
 			this->depot = new Gosu::Image(*graphics, L"data/buildings/depot.png");
 			this->mine = new Gosu::Image(*graphics, L"data/buildings/mine.png");
 			this->factory = new Gosu::Image(*graphics, L"data/buildings/factory.png");
+			this->spaceport = new Gosu::Image(*graphics, L"data/buildings/spaceport.png");
+
 
 			this->smallFont = new Gosu::Font(*graphics, Gosu::defaultFontName(), 12);
 		};
@@ -52,6 +55,9 @@ class BuildingRenderer
 					break;
 				case Factory:
 					this->factory->draw(x, y, z, 1, 1, c);
+					break;
+				case Spaceport:
+					this->spaceport->draw(x, y, z, 1, 1, c);
 					break;
 			};
 
@@ -104,6 +110,9 @@ class BuildingRenderer
 					break;
 				case Factory:
 					this->factory->draw(x, y, z, 1, 1, c);
+					break;
+				case Spaceport:
+					this->spaceport->draw(x, y, z, 1, 1, c);
 					break;
 			};
 		}

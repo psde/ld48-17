@@ -232,6 +232,14 @@
 				RelativePath=".\RessourceRenderer.hpp"
 				>
 			</File>
+			<File
+				RelativePath=".\Unit.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UnitRenderer.hpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

@@ -136,7 +136,7 @@ class Line
 				{
 					for(int i = 0; i < 3; i++)
 					{
-						if(this->start->internalDepot[i] > 0 && (this->end->wantsRes[i] == -1 || this->end->wantsRes[i] > 0))
+						if(this->start->internalDepot[i] > 0 && this->start->energyIn >= this->start->energyRequirement && (this->end->wantsRes[i] == -1 || this->end->wantsRes[i] > 0))
 						{
 							this->ressources.push_back(RessourceOnLine(Point2D(this->start->x, this->start->y), i));
 							this->start->internalDepot[i]--;
