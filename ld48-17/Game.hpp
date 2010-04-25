@@ -54,6 +54,8 @@ class Game
 
 		int activeAsteroid;
 
+		int cargoStep;
+
 	public:
 		PlayingState playState;
 		BuildingType placingBuilding;
@@ -76,6 +78,8 @@ class Game
 
 
 		bool isUnitSelected(Unit* unit);
+
+		int getNearAsteroid(Unit* unit);
 
 };
 

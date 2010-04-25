@@ -1,7 +1,7 @@
 #include "Game.hpp"
 
 Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
-: graphics(graphics), input(input), selectStart(0, 0), selecting(false)
+: graphics(graphics), input(input), selectStart(0, 0), selecting(false), cargoStep(1)
 {
 
 	this->cursor = new Gosu::Image(*graphics, L"data/cursor.png");
@@ -40,10 +40,12 @@ Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
 	Unit* testUnit2 = new Unit(250, 200, Scout);
 	this->units.push_back(testUnit2);
 
-	Unit* testUnit3 = new Unit(600, 500, Scout);
+	Unit* testUnit3 = new Unit(600, 500, Colo);
 	this->units.push_back(testUnit3);
 
 	this->selectedUnits.push_back(testUnit3);
+
+
 }
 
 bool Game::isUnitSelected(Unit* unit)
@@ -117,23 +119,14 @@ void Game::draw()
 	
 	// Ship-GUI:
 
+
 	if(this->selectedUnits.size() == 1)
 	{
 		graphics->drawQuad(250, 700, guiBackgroundFade, 774, 700, guiBackgroundFade, 250, 768, guiBackground, 774, 768, guiBackground, 1000);
 
 		this->cursor_special->draw(290, 725, 1001);
 
-		int nearAsteroid = -1;
-		for(int i = 0; i < this->asteroids.size(); i++)
-		{		
-			int mX = this->selectedUnits[0]->x;
-			int mY = this->selectedUnits[0]->y;
-			if(mX > this->asteroids[i]->x && mX < this->asteroids[i]->w+this->asteroids[i]->x &&
-			   mY > this->asteroids[i]->y && mY < this->asteroids[i]->h+this->asteroids[i]->y)
-			{
-				nearAsteroid = i;
-			}
-		}
+		int nearAsteroid = this->getNearAsteroid(this->selectedUnits[0]);
 		
 		for(int i=0;i<3;i++)
 		{
@@ -149,9 +142,13 @@ void Game::draw()
 
 			}
 			this->resRenderer->draw(340 + i*60, 720, 1001, Ressource::getType(i), 1.5);
-			this->smallFont->draw(L"" + boost::lexical_cast<std::wstring>(this->selectedUnits[0]->cargo[0]) + L"t", 345 + i*60, 750, 1001);
+			this->smallFont->draw(L"" + boost::lexical_cast<std::wstring>(this->selectedUnits[0]->cargo[i]) + L"t", 345 + i*60, 750, 1001);
 		}
-		this->smallFont->draw(L"Capacity left: " + boost::lexical_cast<std::wstring>(this->selectedUnits[0]->getCapacityLeft()) + L"t", 530, 720, 1001);
+		this->smallFont->draw(L"Steps: ", 530, 710, 1001);
+		this->smallFont->draw(L"1t", 570, 710, 1001, 1, 1, (this->cargoStep == 1 ? Gosu::Colors::aqua : Gosu::Colors::white));
+		this->smallFont->draw(L"10t", 585, 710, 1001, 1, 1, (this->cargoStep == 10 ? Gosu::Colors::aqua : Gosu::Colors::white));
+		this->smallFont->draw(L"100t", 605, 710, 1001, 1, 1, (this->cargoStep == 100 ? Gosu::Colors::aqua : Gosu::Colors::white));
+		this->smallFont->draw(L"Capacity left: " + boost::lexical_cast<std::wstring>(this->selectedUnits[0]->getCapacityLeft()) + L"t", 530, 730, 1001);
 	}
 
 /*
@@ -421,21 +418,46 @@ void Game::buttonDown(Gosu::Button button)
 					break;
 			};
 		}
-		else if(this->selectedUnits.size == 1 && x > 250 && x < 774 && y > 700 && y < 774)
+		else if(this->selectedUnits.size() == 1 && x > 250 && x < 774 && y > 700 && y < 774)
 		{
-			// do stuff
+			int nearAsteroid = this->getNearAsteroid(this->selectedUnits[0]);
+			if(nearAsteroid == -1) return;
+
 			for(int i = 0; i < 3; i++)
 			{
-				if(Gosu::distance(x, y, 375 + i*60, 725) < 20)
+				if(Gosu::distance(x, y, 375 + i*60, 725) < 20) // up
 				{
-					cout << "up " << i << endl;
+					if(this->selectedUnits[0]->cargo[i] == 0) return;
+
+					int min = this->cargoStep;
+					if(min > this->selectedUnits[0]->cargo[i]) min = this->selectedUnits[0]->cargo[i];
+					//if(min > this->asteroids[nearAsteroid]->getDepot()->internalDepot[i]) min = this->asteroids[nearAsteroid]->getDepot()->internalDepot[i];
+					
+
+
+					this->asteroids[nearAsteroid]->getDepot()->internalDepot[i]+=min;
+					this->selectedUnits[0]->cargo[i]-=min;
 					break;
 				}				
-				if(Gosu::distance(x, y, 375 + i*60, 740) < 20)
+				if(Gosu::distance(x, y, 375 + i*60, 740) < 20) // down
 				{
-					cout << "down " <<  i << endl;
+					if(this->asteroids[nearAsteroid]->getDepot()->internalDepot[i] == 0) return;
+
+					int min = this->cargoStep;
+					if(min > this->selectedUnits[0]->getCapacityLeft()) min = this->selectedUnits[0]->getCapacityLeft();
+					if(min > this->asteroids[nearAsteroid]->getDepot()->internalDepot[i]) min = this->asteroids[nearAsteroid]->getDepot()->internalDepot[i];
+
+					if(min < 0) return;
+
+					this->asteroids[nearAsteroid]->getDepot()->internalDepot[i]-=min;
+					this->selectedUnits[0]->cargo[i]+=min;
+
 					break;
 				}
+
+				if(x > 570 && x < 585 && y > 710 && y < 720) this->cargoStep = 1;
+				if(x > 585 && x < 605 && y > 710 && y < 720) this->cargoStep = 10;
+				if(x > 605 && x < 635 && y > 710 && y < 720) this->cargoStep = 100;
 			}
 		}
 		else
@@ -555,4 +577,21 @@ void Game::buttonUp(Gosu::Button button)
 
 		}
 	}
+}
+
+
+int Game::getNearAsteroid(Unit* unit)
+{
+	int nearAsteroid = -1;
+	for(int i = 0; i < this->asteroids.size(); i++)
+	{		
+		int mX = unit->x;
+		int mY = unit->y;
+		if(mX > this->asteroids[i]->x && mX < this->asteroids[i]->w+this->asteroids[i]->x &&
+		   mY > this->asteroids[i]->y && mY < this->asteroids[i]->h+this->asteroids[i]->y)
+		{
+			nearAsteroid = i;
+		}
+	}
+	return nearAsteroid;
 }
