@@ -61,6 +61,7 @@ class Asteroid
 		int* getBuildingCost(int type);
 
 		Building* getDepot();
+		bool hasSpaceport();
 
 		bool colonize();
 };

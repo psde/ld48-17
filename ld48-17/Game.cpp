@@ -34,7 +34,7 @@ Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
 	this->playState = Normal;
 	this->activeAsteroid = 0;
 
-	Unit* testUnit1 = new Unit(200, 200, Scout);
+	Unit* testUnit1 = new Unit(200, 200, Cargo);
 	this->units.push_back(testUnit1);
 
 	Unit* testUnit2 = new Unit(250, 200, Scout);
@@ -128,21 +128,35 @@ void Game::draw()
 
 		int nearAsteroid = this->getNearAsteroid(this->selectedUnits[0]);
 		
-		for(int i=0;i<3;i++)
+		
+		if(nearAsteroid != -1)
 		{
-			if(nearAsteroid != -1)
+			Building* depot = this->asteroids[nearAsteroid]->getDepot();
+			for(int i=0;i<3;i++)
 			{
-				Building* depot = this->asteroids[0]->getDepot();
-				if(depot == 0) throw runtime_error("fu");
-				
-				this->smallFont->draw(L"" + boost::lexical_cast<std::wstring>(depot->internalDepot[i]) + L"t", 345 + i*60, 710, 1001);
+				if(depot != 0)
+				{
+					this->smallFont->draw(L"" + boost::lexical_cast<std::wstring>(depot->internalDepot[i]) + L"t", 345 + i*60, 710, 1001);
 
-				this->cursor_up->draw(375 + i*60, 720, 1001);
-				this->cursor_down->draw(375 + i*60, 740, 1001);
+					this->cursor_up->draw(375 + i*60, 720, 1001);
+					if(this->asteroids[nearAsteroid]->hasSpaceport())
+					{	
+						this->cursor_down->draw(375 + i*60, 740, 1001);
+					}
+				}
 
+				this->resRenderer->draw(340 + i*60, 720, 1001, Ressource::getType(i), 1.5);
+				this->smallFont->draw(L"" + boost::lexical_cast<std::wstring>(this->selectedUnits[0]->cargo[i]) + L"t", 345 + i*60, 750, 1001);
 			}
-			this->resRenderer->draw(340 + i*60, 720, 1001, Ressource::getType(i), 1.5);
-			this->smallFont->draw(L"" + boost::lexical_cast<std::wstring>(this->selectedUnits[0]->cargo[i]) + L"t", 345 + i*60, 750, 1001);
+			
+			if(depot == 0)
+			{
+				this->smallFont->draw(L"No Headquarter on asteroid!", 340, 710, 1001, 1, 1, Gosu::Colors::red);
+			}else if(!this->asteroids[nearAsteroid]->hasSpaceport())
+			{	
+				this->smallFont->draw(L"No Spaceport on asteroid!", 530, 750, 1001, 1, 1, Gosu::Colors::red);
+			}
+
 		}
 		this->smallFont->draw(L"Steps: ", 530, 710, 1001);
 		this->smallFont->draw(L"1t", 570, 710, 1001, 1, 1, (this->cargoStep == 1 ? Gosu::Colors::aqua : Gosu::Colors::white));
@@ -375,6 +389,12 @@ void Game::update()
 				{
 					if(this->asteroids[roid]->colonize())
 					{
+
+						Building* depot = this->asteroids[roid]->getDepot();
+						depot->internalDepot[0] = curUnit->cargo[0];
+						depot->internalDepot[1] = curUnit->cargo[1];
+						depot->internalDepot[2] = curUnit->cargo[2];
+
 						del = true;
 						this->selectedUnits.clear();
 						this->playState = Normal;
@@ -632,12 +652,31 @@ void Game::buttonUp(Gosu::Button button)
 	{
 		if(this->playState == Normal && this->selecting)
 		{
+			
 			this->selecting = false;
 
+
+			//check distance, if we only clicked once, only select ONE unit!
 			int sX = this->selectStart.x;
 			int sY = this->selectStart.y;
 			int eX = gamemap->x + (int)input->mouseX();
 			int eY = gamemap->y + (int)input->mouseY();
+
+			if(Gosu::distance(sX, sY, eX, eY) < 20)
+			{
+				this->selectedUnits.clear();
+
+				for(vector<Unit*>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+				{
+					Unit* curUnit = (*it);
+					if(Gosu::distance(sX-20, sY-20, curUnit->x, curUnit->y) < 17)
+					{
+						this->selectedUnits.push_back((*it));
+					}
+
+				}
+				return;
+			}
 
 			if(sX > eX)
 			{

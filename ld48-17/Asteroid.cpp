@@ -417,6 +417,19 @@ Building* Asteroid::getDepot()
 	return 0;
 }
 
+bool Asteroid::hasSpaceport()
+{
+	for(vector<Building*>::iterator it = this->buildings.begin(); it != this->buildings.end(); ++it)
+	{
+		Building* curBuild = (*it);
+		if(curBuild->type == Spaceport)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 bool Asteroid::colonize()
 {
 	if(!this->scouted) return false;

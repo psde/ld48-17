@@ -13,7 +13,7 @@ class UnitRenderer
 		Gosu::Image* backdrop_white;
 		Gosu::Image* scout;
 		Gosu::Image* colo;
-
+		Gosu::Image* cargo;
 
 
 		UnitRenderer(Gosu::Graphics* graphics)
@@ -23,6 +23,7 @@ class UnitRenderer
 			this->backdrop_white = new Gosu::Image(*graphics, L"data/units/backdrop_white.png");
 			this->scout = new Gosu::Image(*graphics, L"data/units/scout.png");
 			this->colo = new Gosu::Image(*graphics, L"data/units/colo.png");
+			this->cargo = new Gosu::Image(*graphics, L"data/units/cargo.png");
 		}
 
 		void drawUnit(int x, int y, int z, Unit* unit, bool selected=false, int sX=0, int sY=0)
@@ -67,6 +68,10 @@ class UnitRenderer
 
 				case Colo:
 					this->colo->draw(x, y, z+1);
+					break;
+
+				case Cargo:
+					this->cargo->draw(x, y, z+1);
 					break;
 			}
 		}

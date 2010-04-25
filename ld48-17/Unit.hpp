@@ -40,7 +40,7 @@ class Unit
 			: x(x), y(y), type(type)
 		{
 			order = DoNothing;
-			speed = 5;
+			
 			targetX = x;
 			targetY = y;
 
@@ -52,14 +52,17 @@ class Unit
 			{
 				case Scout:
 					capacity = 10;
+					speed = 3;
 					break;
 
 				case Colo:
-					capacity = 75;
+					capacity = 125;
+					speed = 1.5;
 					break;
 
 				case Cargo:
-					capacity = 350;
+					capacity = 750;
+					speed = 0.5;
 					break;
 			}
 
