@@ -36,6 +36,8 @@ class Unit
 		}
 
 
+
+
 		void update()
 		{
 			if(order != DoNothing)
@@ -56,6 +58,28 @@ class Unit
 					targetY = y;
 				}
 			}
+		}
+
+
+		static int* getUnitCosts(UnitType type)
+		{
+			int* foo = new int[3];
+
+			switch(type)
+			{
+				case Scout:
+					foo[0] = 15;
+					foo[1] = 5;
+					foo[3] = 2;
+					break;
+
+				case Colo:
+					foo[0] = 120;
+					foo[1] = 35;
+					foo[3] = 15;
+					break;
+			}
+			return foo;
 		}
 
 };

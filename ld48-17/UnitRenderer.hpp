@@ -52,16 +52,7 @@ class UnitRenderer
 			}
 			else
 			{
-				switch(unit->order)
-				{
-					case DoNothing:
-						this->backdrop->draw(x, y, z);
-						break;
-
-					case DoMove:
-						this->backdrop_white->draw(x, y, z, 1, 1, Gosu::Colors::green);
-						break;
-				}
+				this->backdrop_white->draw(x, y, z, 1, 1, c);
 			}
 
 			switch(unit->type)

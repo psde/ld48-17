@@ -4,6 +4,7 @@
 #include "Gosu.hpp"
 #include "Ressource.hpp"
 #include "RessourceArea.hpp"
+#include "Unit.hpp"
 
 enum BuildingType
 {
@@ -39,6 +40,45 @@ class Building
 					return 4;
 			}
 		}
+
+		static int* getBuildingCost(BuildingType type)
+		{
+			int* foo = new int[3];
+
+			switch(type)
+			{
+				case EnergyCollector:
+					foo[0] = 5;
+					foo[1] = 15;
+					foo[2] = 0;
+					break;
+
+				case Mine:
+					foo[0] = 25;
+					foo[1] = 5;
+					foo[2] = 0;
+					break;
+
+				case Depot:
+					foo[0] = 10;
+					foo[1] = 10;
+					foo[2] = 0;
+					break;
+
+				case Factory:
+					foo[0] = 40;
+					foo[1] = 25;
+					foo[2] = 15;
+					break;
+
+				case Spaceport:
+					foo[0] = 50;
+					foo[1] = 40;
+					foo[2] = 30;
+					break;
+			}
+			return foo;
+		}
 		
 		BuildingType type;
 
@@ -55,6 +95,8 @@ class Building
 		int wantsRes[3];
 
 		// factory
+
+		queue<UnitType> factoryQueue;
 
 
 
@@ -76,13 +118,16 @@ class Building
 					switch(this->area->type)
 					{
 						case Ore:
-							this->maxTick = 50;
+							this->maxTick = 250;
+							break;
 						
 						case Silicon:
-							this->maxTick = 50;
+							this->maxTick = 550;
+							break;
 
 						case Uranium:
-							this->maxTick = 50;
+							this->maxTick = 1000;
+							break;
 					}
 				}
 			}

@@ -15,6 +15,7 @@
 #include <math.h>
 
 #include <vector>
+#include <queue>
 
 #include <GosuEx/Shader/Shader.hpp>
 

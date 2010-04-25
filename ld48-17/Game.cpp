@@ -136,6 +136,135 @@ void Game::draw()
 		graphics->drawQuad(this->selectStart.x - gamemap->x, this->selectStart.y - gamemap->y, c, (int)input->mouseX(), this->selectStart.y - gamemap->y, c,
 						   this->selectStart.x - gamemap->x, (int)input->mouseY(), c, (int)input->mouseX(), (int)input->mouseY(), c, 9998); 
 	}
+
+	// draw some help for the player if inside the gui
+	int x = (int)input->mouseX();
+	int y = (int)input->mouseY();
+
+	if(x > 250 && x < 774 && y > 0 && y < 70)
+	{	
+		int selection = -1;
+		for(int i = 0; i < 8; i++)
+		{
+			if(Gosu::distance(x, y, 325 + i*50, 25) < 30)
+			{
+				selection = i;
+				break;
+			}
+		}
+		
+		int length=-1;
+		int height=25;
+		int* cost = 0;
+
+		switch(selection)
+		{
+			case 0:
+				this->smallFont->draw(L"Selection mode", x+5, y+35, 5001);
+				length = 100;
+				break;
+
+			case 1:
+				this->smallFont->draw(L"Place Transportline", x+5, y+35, 5001);
+				length = 120;
+				break;
+
+			case 2:
+				this->smallFont->draw(L"Place Powerline", x+5, y+35, 5001);
+				length = 100;
+				break;
+
+			case 3:
+				this->smallFont->draw(L"Build Energy collector", x+5, y+35, 5001);
+				
+				cost = Building::getBuildingCost(EnergyCollector);
+				this->resRenderer->draw(x+5, y+50, 5001, Ore);
+				this->smallFont->draw(L""+boost::lexical_cast<std::wstring>(cost[0]), x+30, y+53, 5001);
+
+				this->resRenderer->draw(x+50, y+50, 5001, Silicon);
+				this->smallFont->draw(L""+boost::lexical_cast<std::wstring>(cost[1]), x+75, y+53, 5001);
+
+				this->resRenderer->draw(x+95, y+50, 5001, Uranium);
+				this->smallFont->draw(L""+boost::lexical_cast<std::wstring>(cost[2]), x+120, y+53, 5001);
+
+				height = 40;
+				length = 150;
+				break;
+
+			case 4:
+				this->smallFont->draw(L"Build Harvester", x+5, y+35, 5001);
+				
+				cost = Building::getBuildingCost(Mine);
+				this->resRenderer->draw(x+5, y+50, 5001, Ore);
+				this->smallFont->draw(L""+boost::lexical_cast<std::wstring>(cost[0]), x+30, y+53, 5001);
+
+				this->resRenderer->draw(x+50, y+50, 5001, Silicon);
+				this->smallFont->draw(L""+boost::lexical_cast<std::wstring>(cost[1]), x+75, y+53, 5001);
+
+				this->resRenderer->draw(x+95, y+50, 5001, Uranium);
+				this->smallFont->draw(L""+boost::lexical_cast<std::wstring>(cost[2]), x+120, y+53, 5001);
+
+				height = 40;
+				length = 150;
+				break;
+
+			case 5:
+				this->smallFont->draw(L"Build Cargodepot", x+5, y+35, 5001);
+				
+				cost = Building::getBuildingCost(Depot);
+				this->resRenderer->draw(x+5, y+50, 5001, Ore);
+				this->smallFont->draw(L""+boost::lexical_cast<std::wstring>(cost[0]), x+30, y+53, 5001);
+
+				this->resRenderer->draw(x+50, y+50, 5001, Silicon);
+				this->smallFont->draw(L""+boost::lexical_cast<std::wstring>(cost[1]), x+75, y+53, 5001);
+
+				this->resRenderer->draw(x+95, y+50, 5001, Uranium);
+				this->smallFont->draw(L""+boost::lexical_cast<std::wstring>(cost[2]), x+120, y+53, 5001);
+
+				height = 40;
+				length = 150;
+				break;
+
+			case 6:
+				this->smallFont->draw(L"Build Factory", x+5, y+35, 5001);
+				
+				cost = Building::getBuildingCost(Factory);
+				this->resRenderer->draw(x+5, y+50, 5001, Ore);
+				this->smallFont->draw(L""+boost::lexical_cast<std::wstring>(cost[0]), x+30, y+53, 5001);
+
+				this->resRenderer->draw(x+50, y+50, 5001, Silicon);
+				this->smallFont->draw(L""+boost::lexical_cast<std::wstring>(cost[1]), x+75, y+53, 5001);
+
+				this->resRenderer->draw(x+95, y+50, 5001, Uranium);
+				this->smallFont->draw(L""+boost::lexical_cast<std::wstring>(cost[2]), x+120, y+53, 5001);
+
+				height = 40;
+				length = 150;
+				break;
+
+			case 7:
+				this->smallFont->draw(L"Build Spaceport", x+5, y+35, 5001);
+				
+				cost = Building::getBuildingCost(Spaceport);
+				this->resRenderer->draw(x+5, y+50, 5001, Ore);
+				this->smallFont->draw(L""+boost::lexical_cast<std::wstring>(cost[0]), x+30, y+53, 5001);
+
+				this->resRenderer->draw(x+50, y+50, 5001, Silicon);
+				this->smallFont->draw(L""+boost::lexical_cast<std::wstring>(cost[1]), x+75, y+53, 5001);
+
+				this->resRenderer->draw(x+95, y+50, 5001, Uranium);
+				this->smallFont->draw(L""+boost::lexical_cast<std::wstring>(cost[2]), x+120, y+53, 5001);
+
+				height = 40;
+				length = 150;
+				break;
+		}
+
+		if(length != -1) 
+			graphics->drawQuad(x, y+30, guiBackground, x+length, y+30, guiBackground, x, y+30+height, guiBackgroundFade, x+length, y+30+height, guiBackgroundFade, 5000);
+
+	}
+
 }
 
 void Game::update()
@@ -294,6 +423,18 @@ void Game::buttonDown(Gosu::Button button)
 						Line* newLine = new Line(graphics, resRenderer, (this->playState == PlaceEnergyline ? 0 : 1));
 						newLine->start = lineStart;
 						newLine->end = clickedBuilding;
+
+						if(this->playState == PlaceTransportline)
+						{
+							if((newLine->start->type == Depot && newLine->end->type == Mine) || (newLine->start->type == Factory && newLine->end->type == Depot))
+							{
+								Building *tmp = newLine->start;
+								newLine->start = newLine->end;
+								newLine->end = tmp;
+							};
+
+						}
+
 						this->asteroids[activeAsteroid]->addLine(newLine);
 						lineStart = 0;
 					}

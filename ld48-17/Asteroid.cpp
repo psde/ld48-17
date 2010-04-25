@@ -1,10 +1,6 @@
 #include "Asteroid.hpp"
 
-const int BuildingCosts[5][3] = {{5, 15, 0}, // EnergyCollector
-						   {25, 5, 0}, // Mine
-						   {10, 10, 0}, // Depot
-						   {40, 25, 15}, // Factory
-						   {45, 40, 30}}; // spaceport
+
 
 
 Asteroid::Asteroid(Gosu::Graphics* graphics,  Gosu::Input* input, RessourceRenderer* resRenderer, bool capturable, double x, double y, int type, bool start)
@@ -167,7 +163,7 @@ void Asteroid::draw(BuildingRenderer &buildRenderer, int scrollX, int scrollY)
 			}
 		}
 
-		curRA->draw(this->x - scrollX, this->y - scrollY, hovering, (int)input->mouseX(), (int)input->mouseY());
+		curRA->draw(this->x - scrollX, this->y - scrollY, hovering, (int)input->mouseX(), (int)input->mouseY(), this->resRenderer);
 	}
 
 	// Draw all lines
@@ -298,14 +294,15 @@ RessourceArea* Asteroid::getRessourceAreaAt(int x, int y)
 
 void Asteroid::placeBuilding(int x, int y, BuildingType type)
 {
-	int buildType = Building::getBuildingType(type);
 	if(this->isFree(x, y))
 	{
 		RessourceArea* tmpRA = this->getRessourceAreaAt(x, y);
 		
 		if(type == Mine && tmpRA == 0) return;
 
-		if(!this->reduceRessources(BuildingCosts[buildType][0], BuildingCosts[buildType][1], BuildingCosts[buildType][2])) return;
+
+		int* buildingCosts = Building::getBuildingCost(type);
+		if(!this->reduceRessources(buildingCosts[0], buildingCosts[1], buildingCosts[2])) return;
 
 		Building* test = new Building(x, y, type, tmpRA);
 		this->buildings.push_back(test);
@@ -404,17 +401,17 @@ bool Asteroid::reduceRessources(int r1, int r2, int r3)
 	return true;
 }
 
-int* Asteroid::getBuildingCost(BuildingType type)
+/*int* Asteroid::getBuildingCost(BuildingType type)
 {
 	return this->getBuildingCost(Building::getBuildingType(type));
-}
+}*/
 
-int* Asteroid::getBuildingCost(int type)
+/*int* Asteroid::getBuildingCost(int type)
 {
 	int* foo = new int[3];
-	foo[0] = BuildingCosts[type][0];
+	foo[0] = [0];
 	foo[1] = BuildingCosts[type][1];
 	foo[2] = BuildingCosts[type][2];
 
 	return foo;
-}
+}*/

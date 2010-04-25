@@ -73,7 +73,48 @@ class BuildingRenderer
 				Gosu::Color guiBackground(240, 50, 50, 50);
 				Gosu::Color guiBackgroundFade(130, 50, 50, 50);
 
-				graphics->drawQuad(x+50, y, guiBackground, x+200, y, guiBackground, x+50, y+200, guiBackgroundFade, x+200, y+200, guiBackgroundFade, 1010);
+				int length=-1;
+				int height=25;
+
+				switch(build->type)
+				{
+					case EnergyCollector:
+						this->smallFont->draw(L"Energy collector:",x+53, y+3, 1011);
+						this->smallFont->draw(L"Output: " + boost::lexical_cast<std::wstring>(build->energyOut) + L"mW",x+53, y+13, 1011);
+						length = 95;
+						height = 30;
+						break;
+					case Mine:
+						this->smallFont->draw(L"Harvester:",x+53, y+3, 1011);
+						this->smallFont->draw(L"every " + boost::lexical_cast<std::wstring>(build->maxTick) + L" tick",x+53, y+13, 1011);
+						this->smallFont->draw(L"Energy: " + boost::lexical_cast<std::wstring>(build->energyIn) + L" / " + boost::lexical_cast<std::wstring>(build->energyRequirement) ,x+53, y+23, 1011);
+						length = 95;
+						height = 40;
+						break;
+					case Depot:
+						this->smallFont->draw(L"Depot:",x+53, y+3, 1011);
+						this->smallFont->draw(L"Energy: " + boost::lexical_cast<std::wstring>(build->energyIn) + L" / " + boost::lexical_cast<std::wstring>(build->energyRequirement) ,x+53, y+13, 1011);
+						this->smallFont->draw(L"Ore: " + boost::lexical_cast<std::wstring>(build->internalDepot[0]) + L"",x+53, y+23, 1011);
+						this->smallFont->draw(L"Silicon: " + boost::lexical_cast<std::wstring>(build->internalDepot[1]) + L"",x+53, y+33, 1011);
+						this->smallFont->draw(L"Uranium: " + boost::lexical_cast<std::wstring>(build->internalDepot[2]) + L"",x+53, y+43, 1011);
+						length = 95;
+						height = 60;
+						break;
+					case Factory:
+						this->smallFont->draw(L"Factory:",x+53, y+3, 1011);
+						this->smallFont->draw(L"Energy: " + boost::lexical_cast<std::wstring>(build->energyIn) + L" / " + boost::lexical_cast<std::wstring>(build->energyRequirement) ,x+53, y+13, 1011);
+						length = 30;
+						break;
+					case Spaceport:
+						this->smallFont->draw(L"Spaceport:",x+53, y+3, 1011);
+						this->smallFont->draw(L"Energy: " + boost::lexical_cast<std::wstring>(build->energyIn) + L" / " + boost::lexical_cast<std::wstring>(build->energyRequirement) ,x+53, y+13, 1011);
+						length = 30;
+						break;
+				};
+
+				if(length != -1) graphics->drawQuad(x+50, y, guiBackground, x+50+length, y, guiBackground, x+50, y+height, guiBackgroundFade, x+50+length, y+height, guiBackgroundFade, 1010);
+
+				/*graphics->drawQuad(x+50, y, guiBackground, x+200, y, guiBackground, x+50, y+200, guiBackgroundFade, x+200, y+200, guiBackgroundFade, 1010);
 				this->smallFont->draw(L"Type: " + boost::lexical_cast<std::wstring>(build->type),x+60, y+10, 1011);
 				this->smallFont->draw(L"Energy Sup: " + boost::lexical_cast<std::wstring>(build->energySupplied),x+60, y+20, 1011);
 				this->smallFont->draw(L"Energy Req: " + boost::lexical_cast<std::wstring>(build->energyRequirement),x+60, y+30, 1011);
@@ -85,7 +126,7 @@ class BuildingRenderer
 				this->smallFont->draw(L"max tick: " + boost::lexical_cast<std::wstring>(build->maxTick),x+60, y+90, 1011);
 				this->smallFont->draw(L"1: " + boost::lexical_cast<std::wstring>(build->internalDepot[0]),x+60, y+100, 1011);
 				this->smallFont->draw(L"2: " + boost::lexical_cast<std::wstring>(build->internalDepot[1]),x+60, y+110, 1011);
-				this->smallFont->draw(L"3: " + boost::lexical_cast<std::wstring>(build->internalDepot[2]),x+60, y+120, 1011);
+				this->smallFont->draw(L"3: " + boost::lexical_cast<std::wstring>(build->internalDepot[2]),x+60, y+120, 1011);*/
 
 			}
 		}
