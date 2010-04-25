@@ -30,9 +30,9 @@ class Unit
 			: x(x), y(y), type(type)
 		{
 			order = DoNothing;
-			speed = 5;
-			targetX = 0;
-			targetY = 0;
+			speed = 1;
+			targetX = x;
+			targetY = y;
 		}
 
 
@@ -40,14 +40,20 @@ class Unit
 		{
 			if(order != DoNothing)
 			{
-				if(Gosu::distance(x, y, targetX, targetY) > 20)
+				if(Gosu::distance(x, y, targetX, targetY) > 2)
 				{
 					double a = this->x - this->targetX;
 					double b = this->y - this->targetY;
 					double angle = atan2(b, a);
 
-					this->x += cos(angle) * speed;
-					this->y += sin(angle) * speed;
+					this->x += cos(angle) * -speed;
+					this->y += sin(angle) * -speed;
+				}
+				else
+				{
+					order = DoNothing;
+					targetX = x;
+					targetY = y;
 				}
 			}
 		}

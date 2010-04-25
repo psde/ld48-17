@@ -62,7 +62,7 @@ void Game::draw()
 	for(vector<Unit*>::iterator it = this->units.begin(); it != this->units.end(); ++it)
 	{
 		Unit* curUnit = (*it);
-		this->unitRenderer->drawUnit(curUnit->x - gamemap->x, curUnit->y - gamemap->y, 50, curUnit, isUnitSelected(curUnit));
+		this->unitRenderer->drawUnit(curUnit->x - gamemap->x, curUnit->y - gamemap->y, 50, curUnit, isUnitSelected(curUnit), gamemap->x, gamemap->y);
 	}
 
 	this->smallFont->draw(L"mx: " +  boost::lexical_cast<std::wstring>(input->mouseX()), 10, 10, 9999);
@@ -158,21 +158,6 @@ void Game::update()
 		}
 	}
 
-	/*for(vector<Asteroid*>::iterator it = this->asteroids.begin(); it != this->asteroids.end(); ++it)
-	{
-		(*it)->update();
-
-		// check which asteroid
-
-		int mX = (int)input->mouseX();
-		int mY = (int)input->mouseY();
-		if(mX > (*it)->x && mX < (*it)->w && mY > (*it)->y && mY < (*it)->h)
-		{
-			activeAsteroid = 
-		}
-		
-	}*/
-
 	for(int i = 0; i < this->units.size(); i++)
 	{
 		this->units[i]->update();
@@ -264,9 +249,23 @@ void Game::buttonDown(Gosu::Button button)
 
 			if(this->playState == Normal)
 			{
-				this->selectedUnits.clear();
-				this->selecting = true;
-				this->selectStart = Point2D((int)input->mouseX() + this->gamemap->x, (int)input->mouseY() + this->gamemap->y);
+				if(this->selectedUnits.size() > 0)
+				{
+					// order units arround!
+					int mod = 42;
+					for(int i = 0; i < this->selectedUnits.size(); i++)
+					{						
+						selectedUnits[i]->order = DoMove;
+						selectedUnits[i]->targetX = (int)input->mouseX() + this->gamemap->x-20 + mod*i;
+						selectedUnits[i]->targetY = (int)input->mouseY() + this->gamemap->y-20 + (mod%(i+1))*mod;
+					}
+				}
+				else
+				{
+					this->selectedUnits.clear();
+					this->selecting = true;
+					this->selectStart = Point2D((int)input->mouseX() + this->gamemap->x, (int)input->mouseY() + this->gamemap->y);
+				}
 			}else{
 				this->selecting = false;
 			}
