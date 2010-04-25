@@ -25,7 +25,9 @@ enum PlayingState
 	Normal,
 	PlaceTransportline,
 	PlaceEnergyline,
-	PlaceBuilding
+	PlaceBuilding,
+	ShipMove,
+	ShipSpecial
 };
 
 
@@ -38,6 +40,10 @@ class Game
 		Gosu::Font *bigFont;
 
 		Gosu::Image* cursor;
+		Gosu::Image* cursor_up;
+		Gosu::Image* cursor_down;
+		Gosu::Image* cursor_move;
+		Gosu::Image* cursor_special;
 
 		BuildingRenderer* buildRenderer;
 		RessourceRenderer* resRenderer;

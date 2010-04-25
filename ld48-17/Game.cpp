@@ -5,6 +5,10 @@ Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
 {
 
 	this->cursor = new Gosu::Image(*graphics, L"data/cursor.png");
+	this->cursor_move = new Gosu::Image(*graphics, L"data/cursor_move.png");
+	this->cursor_special = new Gosu::Image(*graphics, L"data/cursor_special.png");
+	this->cursor_up = new Gosu::Image(*graphics, L"data/up.png");
+	this->cursor_down = new Gosu::Image(*graphics, L"data/down.png");
 
 	this->buildRenderer = new BuildingRenderer(graphics);
 	this->resRenderer = new RessourceRenderer(graphics);
@@ -36,8 +40,10 @@ Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
 	Unit* testUnit2 = new Unit(250, 200, Scout);
 	this->units.push_back(testUnit2);
 
-	Unit* testUnit3 = new Unit(350, 350, Scout);
+	Unit* testUnit3 = new Unit(600, 500, Scout);
 	this->units.push_back(testUnit3);
+
+	this->selectedUnits.push_back(testUnit3);
 }
 
 bool Game::isUnitSelected(Unit* unit)
@@ -95,7 +101,7 @@ void Game::draw()
 	graphics->drawLine(410, 20, Gosu::Colors::red, 430, 40, Gosu::Colors::red, 1001);
 	this->buildRenderer->drawProp(Building(0, 0, EnergyCollector), 450, 10, 1001);
 	this->buildRenderer->drawProp(Building(0, 0, Mine), 500, 10, 1001);
-	this->buildRenderer->drawProp(Building(0, 0, Depot), 550, 10, 1001);
+	//this->buildRenderer->drawProp(Building(0, 0, Depot), 550, 10, 1001);
 	this->buildRenderer->drawProp(Building(0, 0, Factory), 600, 10, 1001);
 	this->buildRenderer->drawProp(Building(0, 0, Spaceport), 650, 10, 1001);
 
@@ -109,6 +115,44 @@ void Game::draw()
 	this->resRenderer->draw(600, 50, 1001, Uranium);
 	this->smallFont->draw(boost::lexical_cast<std::wstring>(res[2]), 627, 53, 1001);
 	
+	// Ship-GUI:
+
+	if(this->selectedUnits.size() == 1)
+	{
+		graphics->drawQuad(250, 700, guiBackgroundFade, 774, 700, guiBackgroundFade, 250, 768, guiBackground, 774, 768, guiBackground, 1000);
+
+		this->cursor_special->draw(290, 725, 1001);
+
+		int nearAsteroid = -1;
+		for(int i = 0; i < this->asteroids.size(); i++)
+		{		
+			int mX = this->selectedUnits[0]->x;
+			int mY = this->selectedUnits[0]->y;
+			if(mX > this->asteroids[i]->x && mX < this->asteroids[i]->w+this->asteroids[i]->x &&
+			   mY > this->asteroids[i]->y && mY < this->asteroids[i]->h+this->asteroids[i]->y)
+			{
+				nearAsteroid = i;
+			}
+		}
+		
+		for(int i=0;i<3;i++)
+		{
+			if(nearAsteroid != -1)
+			{
+				Building* depot = this->asteroids[0]->getDepot();
+				if(depot == 0) throw runtime_error("fu");
+				
+				this->smallFont->draw(L"" + boost::lexical_cast<std::wstring>(depot->internalDepot[i]) + L"t", 345 + i*60, 710, 1001);
+
+				this->cursor_up->draw(375 + i*60, 720, 1001);
+				this->cursor_down->draw(375 + i*60, 740, 1001);
+
+			}
+			this->resRenderer->draw(340 + i*60, 720, 1001, Ressource::getType(i), 1.5);
+			this->smallFont->draw(L"" + boost::lexical_cast<std::wstring>(this->selectedUnits[0]->cargo[0]) + L"t", 345 + i*60, 750, 1001);
+		}
+		this->smallFont->draw(L"Capacity left: " + boost::lexical_cast<std::wstring>(this->selectedUnits[0]->getCapacityLeft()) + L"t", 530, 720, 1001);
+	}
 
 /*
 	GosuEx::Shader local(*graphics);
@@ -137,7 +181,9 @@ void Game::draw()
 						   this->selectStart.x - gamemap->x, (int)input->mouseY(), c, (int)input->mouseX(), (int)input->mouseY(), c, 9998); 
 	}
 
-	// draw some help for the player if inside the gui
+
+
+	// draw some help for the player if inside the top gui
 	int x = (int)input->mouseX();
 	int y = (int)input->mouseY();
 
@@ -209,7 +255,7 @@ void Game::draw()
 				break;
 
 			case 5:
-				this->smallFont->draw(L"Build Cargodepot", x+5, y+35, 5001);
+				/*this->smallFont->draw(L"Build Cargodepot", x+5, y+35, 5001);
 				
 				cost = Building::getBuildingCost(Depot);
 				this->resRenderer->draw(x+5, y+50, 5001, Ore);
@@ -220,7 +266,7 @@ void Game::draw()
 
 				this->resRenderer->draw(x+95, y+50, 5001, Uranium);
 				this->smallFont->draw(L""+boost::lexical_cast<std::wstring>(cost[2]), x+120, y+53, 5001);
-
+*/
 				height = 40;
 				length = 150;
 				break;
@@ -264,6 +310,8 @@ void Game::draw()
 			graphics->drawQuad(x, y+30, guiBackground, x+length, y+30, guiBackground, x, y+30+height, guiBackgroundFade, x+length, y+30+height, guiBackgroundFade, 5000);
 
 	}
+
+	// same for bottom gui
 
 }
 
@@ -358,8 +406,8 @@ void Game::buttonDown(Gosu::Button button)
 					break;
 
 				case 5:
-					this->playState = PlaceBuilding;
-					this->placingBuilding = Depot;
+					/*this->playState = PlaceBuilding;
+					this->placingBuilding = Depot;*/
 					break;
 
 				case 6:
@@ -372,6 +420,23 @@ void Game::buttonDown(Gosu::Button button)
 					this->placingBuilding = Spaceport;
 					break;
 			};
+		}
+		else if(this->selectedUnits.size == 1 && x > 250 && x < 774 && y > 700 && y < 774)
+		{
+			// do stuff
+			for(int i = 0; i < 3; i++)
+			{
+				if(Gosu::distance(x, y, 375 + i*60, 725) < 20)
+				{
+					cout << "up " << i << endl;
+					break;
+				}				
+				if(Gosu::distance(x, y, 375 + i*60, 740) < 20)
+				{
+					cout << "down " <<  i << endl;
+					break;
+				}
+			}
 		}
 		else
 		{
@@ -476,10 +541,6 @@ void Game::buttonUp(Gosu::Button button)
 			{
 				Unit* curUnit = (*it);
 				
-/*
-		graphics->drawQuad(this->selectStart.x - gamemap->x, this->selectStart.y - gamemap->y, c, (int)input->mouseX(), this->selectStart.y - gamemap->y, c,
-						   this->selectStart.x - gamemap->x, (int)input->mouseY(), c, (int)input->mouseX(), (int)input->mouseY(), c, 9998); 
-		*/
 				int x = curUnit->x+20;
 				int y = curUnit->y+20;
 				
@@ -492,7 +553,6 @@ void Game::buttonUp(Gosu::Button button)
 				}
 			}
 
-			// bounding box fun?
 		}
 	}
 }

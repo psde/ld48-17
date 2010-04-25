@@ -57,6 +57,8 @@ class Asteroid
 		
 		int* getBuildingCost(BuildingType type);
 		int* getBuildingCost(int type);
+
+		Building* getDepot();
 };
 
 #endif

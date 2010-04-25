@@ -401,17 +401,15 @@ bool Asteroid::reduceRessources(int r1, int r2, int r3)
 	return true;
 }
 
-/*int* Asteroid::getBuildingCost(BuildingType type)
+Building* Asteroid::getDepot()
 {
-	return this->getBuildingCost(Building::getBuildingType(type));
-}*/
-
-/*int* Asteroid::getBuildingCost(int type)
-{
-	int* foo = new int[3];
-	foo[0] = [0];
-	foo[1] = BuildingCosts[type][1];
-	foo[2] = BuildingCosts[type][2];
-
-	return foo;
-}*/
+	for(vector<Building*>::iterator it = this->buildings.begin(); it != this->buildings.end(); ++it)
+	{
+		Building* curBuild = (*it);
+		if(curBuild->type == Depot)
+		{
+			return (*it);
+		}
+	}
+	return 0;
+}

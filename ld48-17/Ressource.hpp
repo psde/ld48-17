@@ -13,6 +13,18 @@ class Ressource
 	public:
 		RessourceType type;
 
+		static RessourceType getType(int i)
+		{
+			switch(i)
+			{
+				case 0:
+					return Ore;
+				case 1:
+					return Silicon;
+				case 2:
+					return Uranium;
+			}
+		}
 };
 
 #endif

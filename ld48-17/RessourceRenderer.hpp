@@ -21,20 +21,20 @@ class RessourceRenderer
 			this->silicon = new Gosu::Image(*graphics, L"data/ressources/silicon.png");
 		}
 
-		void draw(int x, int y, int z, RessourceType type)
+		void draw(int x, int y, int z, RessourceType type, double factor=1)
 		{
 			switch(type)
 			{
 				case Ore:
-					this->ore->draw(x, y, z);
+					this->ore->draw(x, y, z, factor, factor);
 					break;
 
 				case Uranium:
-					this->uranium->draw(x, y, z);
+					this->uranium->draw(x, y, z, factor, factor);
 					break;
 
 				case Silicon:
-					this->silicon->draw(x, y, z);
+					this->silicon->draw(x, y, z, factor, factor);
 					break;
 			}
 		}
