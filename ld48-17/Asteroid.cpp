@@ -1,22 +1,104 @@
 #include "Asteroid.hpp"
 
 
-Asteroid::Asteroid(Gosu::Graphics* graphics,  Gosu::Input* input, RessourceRenderer* resRenderer, bool capturable, double x, double y, int type)
-: graphics(graphics), input(input), resRenderer(resRenderer), capturable(capturable), x(x), y(y)
+Asteroid::Asteroid(Gosu::Graphics* graphics,  Gosu::Input* input, RessourceRenderer* resRenderer, bool capturable, double x, double y, int type, bool start)
+: graphics(graphics), input(input), resRenderer(resRenderer), capturable(capturable), x(x), y(y), hover(0), maxHover(15)
 {
-	this->img = new Gosu::Image(*graphics, L"data/asteroids/1.png");
+	this->img = new Gosu::Image(*graphics, L"data/asteroids/" + boost::lexical_cast<std::wstring>(type) + L".png");
 	this->w = this->img->width();
 	this->h = this->img->height();
 	
-	this->imgBuildMap = new Gosu::Image(*graphics, L"data/asteroids/1.bmp");
-	this->buildMap = Gosu::quickLoadBitmap(L"data/asteroids/1.bmp");
+	this->imgBuildMap = new Gosu::Image(*graphics, L"data/asteroids/" + boost::lexical_cast<std::wstring>(type) + L".bmp");
+	this->buildMap = Gosu::quickLoadBitmap(L"data/asteroids/" + boost::lexical_cast<std::wstring>(type) + L".bmp");
 
 
+	int curRA = -1;
+
+	wstring f = L"data/asteroids/" +  boost::lexical_cast<std::wstring>(type) + L".txt";
+	char zeile[550];
+	string szeile;
+
+	std::ifstream eingabe(f.c_str(),ios::in);
+	
+	if (eingabe.good()) {
+		eingabe.seekg(0L,ios::end);
+		eingabe.seekg(0L,ios::beg);
+		while (!eingabe.eof()) {
+			eingabe.getline(zeile,500);
+			szeile = zeile;
+				
+			if(szeile.find("=") < 99){
+				string name = szeile.substr(0,1);
+				string cmd = szeile.substr(0,szeile.find("="));
+				string arg = szeile.substr(szeile.find("=")+1);
+
+				if(cmd == "startDepot"){
+					int dx = atoi(arg.substr(0,arg.find(",")).c_str());
+					int dy = atoi(arg.substr(arg.find(",")+1,arg.find("@")).c_str());
+
+					string res = arg.substr(arg.find("@")+1).c_str();
+
+					int r1 = atoi(res.substr(0,res.find(",")).c_str());
+					res = res.substr(res.find(",")+1).c_str();
+
+					int r2 = atoi(res.substr(0,res.find(",")).c_str());
+					res = res.substr(res.find(",")+1).c_str();
+
+					int r3 = atoi(res.substr(0,res.find(",")).c_str());
+
+					if(start)
+					{
+						Building* startDepot = new Building(dx, dy, Depot);
+						startDepot->internalDepot[0] = r1;
+						startDepot->internalDepot[1] = r2;
+						startDepot->internalDepot[2] = r3;
+						this->buildings.push_back(startDepot);
+					}
+				}
+				
+				if(cmd == "ressourceType"){
+					//cout << arg << endl;
+					RessourceArea* newRA = new RessourceArea(graphics);
+					switch(atoi(arg.c_str()))
+					{
+						case 0:
+							newRA->type = Ore;
+							break;
+						case 1:
+							newRA->type = Silicon;
+							break;
+						case 2:
+							newRA->type = Uranium;
+							break;
+
+					};
+					curRA++;
+					this->ressourceAreas.push_back(newRA);
+				}
+
+				if(cmd == "ressourceTons")
+				{
+					this->ressourceAreas[curRA]->availableTons = atoi(arg.c_str());
+				}
+
+				if(cmd == "ressourcePoint")
+				{
+					int dx = atoi(arg.substr(0,arg.find(",")).c_str());
+					int dy = atoi(arg.substr(arg.find(",")+1,arg.find("@")).c_str());
+					this->ressourceAreas[curRA]->area.push_back(Point2D(dx, dy));
+				}
+
+
+			}
+		}
+	}else{
+		throw runtime_error("foo :(");
+	}
 
 
 	// Ressource-Area test:
 
-	RessourceArea* testRA = new RessourceArea(graphics);
+	/*RessourceArea* testRA = new RessourceArea(graphics);
 	testRA->availableTons = 100;
 	testRA->type = Uranium;
 	testRA->area.push_back(Point2D(226, 052));
@@ -49,7 +131,7 @@ Asteroid::Asteroid(Gosu::Graphics* graphics,  Gosu::Input* input, RessourceRende
 	newLine = new Line(graphics, resRenderer, 1);
 	newLine->start = test2;
 	newLine->end = test3;
-	this->addLine(newLine);
+	this->addLine(newLine);*/
 
 }
 

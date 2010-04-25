@@ -19,7 +19,7 @@ Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
 		this->asteroids.push_back(newAsteroid);
 	}*/
 
-	Asteroid* newAsteroid1 = new Asteroid(graphics, input, resRenderer, true, 100, 100, 1);
+	Asteroid* newAsteroid1 = new Asteroid(graphics, input, resRenderer, true, 100, 100, 1, true);
 	this->asteroids.push_back(newAsteroid1);
 
 	Asteroid* newAsteroid2 = new Asteroid(graphics, input, resRenderer, true, 600, 250, 1);
@@ -76,10 +76,10 @@ void Game::draw()
 	this->resRenderer->draw(400, 50, 1001, Ore);
 	this->smallFont->draw(boost::lexical_cast<std::wstring>(res[0]), 427, 53, 1001);
 
-	this->resRenderer->draw(500, 50, 1001, Uranium);
+	this->resRenderer->draw(500, 50, 1001, Silicon);
 	this->smallFont->draw(boost::lexical_cast<std::wstring>(res[1]), 527, 53, 1001);
 
-	this->resRenderer->draw(600, 50, 1001, Silicon);
+	this->resRenderer->draw(600, 50, 1001, Uranium);
 	this->smallFont->draw(boost::lexical_cast<std::wstring>(res[2]), 627, 53, 1001);
 	
 

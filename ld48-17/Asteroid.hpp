@@ -26,11 +26,14 @@ class Asteroid
 
 		vector<Line*> lines;
 
+		int hover;
+		int maxHover;
+
 	public:
 		const bool capturable;
 		double x, y, w, h;
 
-		Asteroid(Gosu::Graphics* graphics, Gosu::Input* input, RessourceRenderer* resRenderer, bool capturable, double x, double y, int type);
+		Asteroid(Gosu::Graphics* graphics, Gosu::Input* input, RessourceRenderer* resRenderer, bool capturable, double x, double y, int type, bool start=false);
 		
 
 		void draw(BuildingRenderer &buildRenderer, int scrollX, int scrollY);

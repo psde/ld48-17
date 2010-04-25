@@ -67,7 +67,12 @@ class Building
 				this->wantsRes[1] = -1;
 				this->wantsRes[2] = -1;
 			}
-			if(type == Factory) energyRequirement = 25;
+
+			if(type == Factory)
+			{
+				energyRequirement = 25;
+				this->wantsRes[2] = 10;
+			}
 		}
 
 		void update()

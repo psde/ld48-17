@@ -25,7 +25,7 @@ class RessourceArea
 		double availableTons;
 		vector<Point2D> area;
 
-		void draw(int x, int y)
+		void draw(int x, int y, bool hover=false)
 		{
 			graphics->beginGL();
 
