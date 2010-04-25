@@ -50,6 +50,9 @@ Asteroid::Asteroid(Gosu::Graphics* graphics,  Gosu::Input* input, RessourceRende
 
 					int r3 = atoi(res.substr(0,res.find(",")).c_str());
 
+					depotStartX = dx;
+					depotStartY = dy;
+
 					if(start)
 					{
 						Building* startDepot = new Building(dx, dy, Depot);
@@ -412,4 +415,18 @@ Building* Asteroid::getDepot()
 		}
 	}
 	return 0;
+}
+
+bool Asteroid::colonize()
+{
+	if(!this->scouted) return false;
+
+	if(this->buildings.size() == 0)
+	{
+		Building* startDepot = new Building(depotStartX, depotStartY, Depot);
+		this->buildings.push_back(startDepot);
+		return true;
+	}
+	
+	return false;
 }

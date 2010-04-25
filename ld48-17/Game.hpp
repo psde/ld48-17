@@ -26,7 +26,6 @@ enum PlayingState
 	PlaceTransportline,
 	PlaceEnergyline,
 	PlaceBuilding,
-	ShipMove,
 	ShipSpecial
 };
 

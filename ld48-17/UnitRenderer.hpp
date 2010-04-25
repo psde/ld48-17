@@ -34,6 +34,10 @@ class UnitRenderer
 				case DoMove:
 					c = Gosu::Colors::green;
 					break;
+
+				case DoSpecial:
+					c = Gosu::Colors::red;
+					break;
 			}
 
 

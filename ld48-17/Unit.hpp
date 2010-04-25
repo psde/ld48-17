@@ -12,8 +12,14 @@ enum UnitOrder
 {
 	DoNothing,
 	DoMove,
-	DoScout,
-	DoColo
+	DoSpecial
+};
+
+enum UnitUpdateResult
+{
+	NothingSpecial,
+	AsteroidScouted,
+	AsteroidColonizized
 };
 
 class Unit
@@ -34,7 +40,7 @@ class Unit
 			: x(x), y(y), type(type)
 		{
 			order = DoNothing;
-			speed = 1;
+			speed = 5;
 			targetX = x;
 			targetY = y;
 
@@ -66,11 +72,11 @@ class Unit
 		}
 
 
-		void update()
+		UnitUpdateResult update()
 		{
 			if(order != DoNothing)
 			{
-				if(Gosu::distance(x, y, targetX, targetY) > 2)
+				if(Gosu::distance(x, y, targetX, targetY) > 5)
 				{
 					double a = this->x - this->targetX;
 					double b = this->y - this->targetY;
@@ -81,11 +87,26 @@ class Unit
 				}
 				else
 				{
-					order = DoNothing;
 					targetX = x;
 					targetY = y;
+
+					if(order == DoSpecial)
+					{
+						if(type == Colo)
+						{
+							return AsteroidColonizized;
+						}
+						if(type == Scout)
+						{
+							order = DoNothing;
+							return AsteroidScouted;
+						}
+					}
+
+					order = DoNothing;
 				}
 			}
+			return NothingSpecial;
 		}
 
 

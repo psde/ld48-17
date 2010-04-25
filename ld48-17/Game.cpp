@@ -27,7 +27,7 @@ Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
 	Asteroid* newAsteroid1 = new Asteroid(graphics, input, resRenderer, true, 500, 300, 1, true);
 	this->asteroids.push_back(newAsteroid1);
 
-	Asteroid* newAsteroid2 = new Asteroid(graphics, input, resRenderer, true, 1500, 2050, 1);
+	Asteroid* newAsteroid2 = new Asteroid(graphics, input, resRenderer, true, 500, 1050, 1);
 	this->asteroids.push_back(newAsteroid2);
 
 	this->gamemap = new Map(graphics, 5000);
@@ -169,7 +169,19 @@ void Game::draw()
 		}
 	}
 
-	this->cursor->draw((int)input->mouseX(), (int)input->mouseY(), 9999);
+	// Draw the cursor
+	if(this->playState == ShipSpecial)
+	{
+		this->cursor_special->draw((int)input->mouseX(), (int)input->mouseY(), 9999);
+	}
+	else
+	{
+		this->cursor->draw((int)input->mouseX(), (int)input->mouseY(), 9999);
+		if(this->playState == PlaceBuilding)
+		{
+			this->buildRenderer->drawProp(Building(0, 0, this->placingBuilding), (int)input->mouseX() - 20, (int)input->mouseY() - 20, 9995);
+		}
+	}
 
 	if(this->playState == Normal && this->selecting)
 	{
@@ -332,9 +344,52 @@ void Game::update()
 		}
 	}
 
-	for(int i = 0; i < this->units.size(); i++)
+	for(vector<Unit*>::iterator it = this->units.begin(); it != this->units.end(); )
 	{
-		this->units[i]->update();
+		bool del = false;
+
+		Unit* curUnit = (*it);
+		UnitUpdateResult foo = curUnit->update();
+
+		if(foo != NothingSpecial)
+		{
+			// Which asteroid?
+			int roid = -1;
+			for(int i = 0; i < this->asteroids.size(); i++)
+			{
+				int mX = curUnit->x;
+				int mY = curUnit->y;
+				if(mX > this->asteroids[i]->x && mX < this->asteroids[i]->w+this->asteroids[i]->x &&
+				   mY > this->asteroids[i]->y && mY < this->asteroids[i]->h+this->asteroids[i]->y)
+				{
+					roid = i;
+				}
+			}
+			if(roid != -1)
+			{
+				if(foo == AsteroidScouted)
+				{
+					this->asteroids[roid]->scouted = true;
+				}
+				if(foo == AsteroidColonizized)
+				{
+					if(this->asteroids[roid]->colonize())
+					{
+						del = true;
+						this->selectedUnits.clear();
+						this->playState = Normal;
+					}
+				}
+			}
+		}
+		if(del)
+		{
+			it = this->units.erase(it);
+		}
+		else
+		{
+			it++;
+		}
 	}
 
 	if(input->down(Gosu::kbLeft)) gamemap->x -= 10;
@@ -373,6 +428,9 @@ void Game::buttonDown(Gosu::Button button)
 					break;
 				}
 			}
+
+			if(selection >=1) this->selectedUnits.clear();
+
 			switch(selection)
 			{
 				case -1:
@@ -420,6 +478,14 @@ void Game::buttonDown(Gosu::Button button)
 		}
 		else if(this->selectedUnits.size() == 1 && x > 250 && x < 774 && y > 700 && y < 774)
 		{
+			
+			if(x > 280 && x < 350 && y > 705 && y < 760)
+			{
+				this->playState = ShipSpecial;	
+				return;
+			}
+
+
 			int nearAsteroid = this->getNearAsteroid(this->selectedUnits[0]);
 			if(nearAsteroid == -1) return;
 
@@ -526,6 +592,34 @@ void Game::buttonDown(Gosu::Button button)
 						lineStart = 0;
 					}
 				}
+			}
+
+			if(this->playState == ShipSpecial)
+			{
+				if(this->selectedUnits.size() != 1) return;
+				if(this->selectedUnits[0]->type == Cargo) return;
+
+				// check if user clicked asteroid
+				int roid = -1;
+				for(int i = 0; i < this->asteroids.size(); i++)
+				{
+					int mX = (int)input->mouseX() + this->gamemap->x;
+					int mY = (int)input->mouseY() + this->gamemap->y;
+					if(mX > this->asteroids[i]->x && mX < this->asteroids[i]->w+this->asteroids[i]->x &&
+					   mY > this->asteroids[i]->y && mY < this->asteroids[i]->h+this->asteroids[i]->y)
+					{
+						roid = i;
+					}
+				}
+
+				if(roid != -1)
+				{
+					this->selectedUnits[0]->targetX = this->asteroids[roid]->x + this->asteroids[roid]->w/2;
+					this->selectedUnits[0]->targetY = this->asteroids[roid]->y + this->asteroids[roid]->h/2;
+					this->selectedUnits[0]->order = DoSpecial;
+					this->playState = Normal;
+				}
+
 			}
 
 		}

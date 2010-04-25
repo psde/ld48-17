@@ -36,6 +36,8 @@ class Asteroid
 		bool scouted;
 		double x, y, w, h;
 
+		double depotStartX, depotStartY;
+
 		Asteroid(Gosu::Graphics* graphics, Gosu::Input* input, RessourceRenderer* resRenderer, bool capturable, double x, double y, int type, bool start=false);
 		
 
@@ -59,6 +61,8 @@ class Asteroid
 		int* getBuildingCost(int type);
 
 		Building* getDepot();
+
+		bool colonize();
 };
 
 #endif
