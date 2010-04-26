@@ -1,7 +1,7 @@
 startDepot=310,284@0,0,0
 
 ressourceType=0
-ressourceTons=550
+ressourceTons=2750
 ressourcePoint=200,30
 ressourcePoint=301,44
 ressourcePoint=365,79
@@ -10,7 +10,7 @@ ressourcePoint=191,141
 ressourcePoint=168,92
 
 ressourceType=1
-ressourceTons=300
+ressourceTons=1200
 ressourcePoint=99,331
 ressourcePoint=74,290
 ressourcePoint=95,248
@@ -19,7 +19,7 @@ ressourcePoint=190,320
 
 
 ressourceType=2
-ressourceTons=150
+ressourceTons=850
 ressourcePoint=88,185
 ressourcePoint=125,176
 ressourcePoint=161,207

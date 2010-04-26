@@ -127,8 +127,8 @@ class Line
 						double angle = atan2(b, a);
 
 
-						(*it).x += cos(angle) * speed+0.2;
-						(*it).y += sin(angle) * speed+0.2;
+						(*it).x += cos(angle) * speed;
+						(*it).y += sin(angle) * speed;
 						it++;
 					}
 			}
