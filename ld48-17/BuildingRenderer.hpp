@@ -76,6 +76,8 @@ class BuildingRenderer
 				int length=-1;
 				int height=25;
 
+				wstring inBuild = L"";
+
 				switch(build->type)
 				{
 					case EnergyCollector:
@@ -103,12 +105,39 @@ class BuildingRenderer
 					case Factory:
 						this->smallFont->draw(L"Factory:",x+53, y+3, 1011);
 						this->smallFont->draw(L"Energy: " + boost::lexical_cast<std::wstring>(build->energyIn) + L" / " + boost::lexical_cast<std::wstring>(build->energyRequirement) ,x+53, y+13, 1011);
-						length = 30;
+
+						switch(build->unitInBuild)
+						{
+							case Scout:
+								inBuild = L"Scout";
+								break;
+							case Cargo:
+								inBuild = L"Cargoship";
+								break;
+							case Colo:
+								inBuild = L"Coloship";
+								break;
+							case NoUnit:
+								inBuild = L"Nothing";
+								break;
+						}
+
+						this->smallFont->draw(L"Currenty builds:",x+53, y+23, 1011);
+						this->smallFont->draw(L" " + inBuild,x+53, y+33, 1011);
+						if(build->unitInBuild != NoUnit) this->smallFont->draw(L"Completed: " + boost::lexical_cast<std::wstring>(build->tick) + L" / " + boost::lexical_cast<std::wstring>(build->maxTick),x+53, y+43, 1011);
+
+						this->smallFont->draw(L"Ressources needed:",x+53, y+53, 1011);
+						this->smallFont->draw(L"Ore: " +  boost::lexical_cast<std::wstring>(build->wantsRes[0]),x+53, y+73, 1011);
+						this->smallFont->draw(L"Silicon: " + boost::lexical_cast<std::wstring>(build->wantsRes[1]),x+53, y+83, 1011);
+						this->smallFont->draw(L"Uranium: " + boost::lexical_cast<std::wstring>(build->wantsRes[2]),x+53, y+93, 1011);
+						length = 100;
+						height = 110;
 						break;
+
 					case Spaceport:
 						this->smallFont->draw(L"Spaceport:",x+53, y+3, 1011);
 						this->smallFont->draw(L"Energy: " + boost::lexical_cast<std::wstring>(build->energyIn) + L" / " + boost::lexical_cast<std::wstring>(build->energyRequirement) ,x+53, y+13, 1011);
-						length = 30;
+						length = 90;
 						break;
 				};
 

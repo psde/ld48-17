@@ -1,0 +1,1 @@
+ld48-17.exe -fullscreen

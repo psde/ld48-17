@@ -1,0 +1,11 @@
+startDepot=158,89@0,0,0
+
+ressourceType=2
+ressourceTons=750
+ressourcePoint=41,48
+ressourcePoint=91,19
+ressourcePoint=170,45
+ressourcePoint=172,150
+ressourcePoint=155,207
+ressourcePoint=107,188
+ressourcePoint=30,130

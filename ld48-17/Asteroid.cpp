@@ -12,7 +12,7 @@ Asteroid::Asteroid(Gosu::Graphics* graphics,  Gosu::Input* input, RessourceRende
 	this->w = this->img->width();
 	this->h = this->img->height();
 	
-	this->imgBuildMap = new Gosu::Image(*graphics, L"data/asteroids/" + boost::lexical_cast<std::wstring>(type) + L".bmp");
+	//this->imgBuildMap = new Gosu::Image(*graphics, L"data/asteroids/" + boost::lexical_cast<std::wstring>(type) + L".bmp");
 	this->buildMap = Gosu::quickLoadBitmap(L"data/asteroids/" + boost::lexical_cast<std::wstring>(type) + L".bmp");
 
 
@@ -101,7 +101,6 @@ Asteroid::Asteroid(Gosu::Graphics* graphics,  Gosu::Input* input, RessourceRende
 	}else{
 		throw runtime_error("foo :(");
 	}
-
 
 	// Ressource-Area test:
 
@@ -215,7 +214,7 @@ void Asteroid::draw(BuildingRenderer &buildRenderer, int scrollX, int scrollY)
 	
 }
 
-void Asteroid::update()
+void Asteroid::update(vector<Unit*> &units, int scrollX, int scrollY)
 {
 	// Reset energy input
 	for(vector<Building*>::iterator it = this->buildings.begin(); it != this->buildings.end(); ++it)
@@ -235,7 +234,19 @@ void Asteroid::update()
 
 	for(vector<Building*>::iterator it = this->buildings.begin(); it != this->buildings.end(); ++it)
 	{
-		(*it)->update();
+		if((*it)->update() == BuildingFactoryFinished)
+		{
+
+			Unit* testUnit = new Unit((*it)->x + this->x, (*it)->y + this->y, (*it)->unitInBuild);
+			testUnit->order = DoMove;
+			testUnit->targetX = (*it)->x + this->x + (*it)->clusterMod - 100;
+			testUnit->targetY = (*it)->y + this->y + 50;
+			units.push_back(testUnit);
+
+			(*it)->clusterMod+=25;
+			if((*it)->clusterMod > 200) (*it)->clusterMod = 0;
+			(*it)->unitInBuild = NoUnit;
+		}
 	}
 
 }
@@ -424,7 +435,7 @@ bool Asteroid::hasSpaceport()
 		Building* curBuild = (*it);
 		if(curBuild->type == Spaceport)
 		{
-			return true;
+			if(curBuild->energyIn >= curBuild->energyRequirement) return true;
 		}
 	}
 	return false;

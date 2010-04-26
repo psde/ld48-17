@@ -6,7 +6,7 @@
 #include "RessourceArea.hpp"
 #include "Building.hpp"
 #include "Line.hpp"
-
+#include "Unit.hpp"
 
 class Asteroid
 {
@@ -22,7 +22,6 @@ class Asteroid
 
 
 		vector<RessourceArea*> ressourceAreas;
-		vector<Building*> buildings;
 
 		vector<Line*> powerlines;
 		vector<Line*> transportlines;
@@ -38,11 +37,13 @@ class Asteroid
 
 		double depotStartX, depotStartY;
 
+		vector<Building*> buildings;
+
 		Asteroid(Gosu::Graphics* graphics, Gosu::Input* input, RessourceRenderer* resRenderer, bool capturable, double x, double y, int type, bool start=false);
 		
 
 		void draw(BuildingRenderer &buildRenderer, int scrollX, int scrollY);
-		void update();
+		void update(vector<Unit*> &units, int scrollX, int scrollY);
 
 		bool isFree(int x, int y);
 		void placeBuilding(int x, int y, BuildingType type);

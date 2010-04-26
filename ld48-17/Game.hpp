@@ -26,7 +26,8 @@ enum PlayingState
 	PlaceTransportline,
 	PlaceEnergyline,
 	PlaceBuilding,
-	ShipSpecial
+	ShipSpecial,
+	FactoryGUI
 };
 
 
@@ -58,6 +59,8 @@ class Game
 	public:
 		PlayingState playState;
 		BuildingType placingBuilding;
+
+		Building* factory;
 
 		GameState gameState;
 

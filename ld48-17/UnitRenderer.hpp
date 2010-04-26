@@ -76,6 +76,25 @@ class UnitRenderer
 			}
 		}
 
+
+		void drawUnitProp(int x, int y, int z, UnitType type, double factor = 1)
+		{
+			this->backdrop_white->draw(x, y, z, factor, factor);
+			switch(type)
+			{
+				case Scout:
+					this->scout->draw(x, y, z+1, factor, factor);
+					break;
+
+				case Colo:
+					this->colo->draw(x, y, z+1, factor, factor);
+					break;
+
+				case Cargo:
+					this->cargo->draw(x, y, z+1, factor, factor);
+					break;
+			}
+		}
 };
 
 #endif

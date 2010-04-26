@@ -21,8 +21,8 @@ class GosuWindow : public Gosu::Window
 		Game* game;
 
 	public:
-		GosuWindow()
-		 :	Gosu::Window(1024, 768, false)
+		GosuWindow(bool fullscreen)
+		 :	Gosu::Window(1024, 768, fullscreen)
 		{
 			setCaption(L"Space Islands!");
 			glewInit();
@@ -61,7 +61,13 @@ class GosuWindow : public Gosu::Window
 
 int main(int argc, char* argv[])
 {
-    GosuWindow win;
+	bool fullscreen = false;
+	for(int i=1;i<argc;i++)
+	{
+		if(strcmp(argv[i], "-fullscreen") == 0) fullscreen = true;
+	}
+
+    GosuWindow win(fullscreen);
     win.show();
 
 	return 0;

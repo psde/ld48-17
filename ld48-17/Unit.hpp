@@ -5,7 +5,9 @@ enum UnitType
 {
 	Scout,
 	Colo,
-	Cargo
+	Cargo,
+
+	NoUnit = 9999
 };
 
 enum UnitOrder
@@ -122,19 +124,19 @@ class Unit
 				case Scout:
 					foo[0] = 15;
 					foo[1] = 5;
-					foo[3] = 2;
+					foo[2] = 2;
 					break;
 
 				case Colo:
 					foo[0] = 120;
 					foo[1] = 35;
-					foo[3] = 15;
+					foo[2] = 15;
 					break;
 
 				case Cargo:
 					foo[0] = 75;
 					foo[1] = 10;
-					foo[3] = 30;
+					foo[2] = 30;
 					break;
 			}
 			return foo;
@@ -152,6 +154,21 @@ class Unit
 
 				case Cargo:
 					return 2500;
+			}
+		}
+
+		static UnitType getUnitType(int type)
+		{
+			switch(type)
+			{
+				case 0:
+					return Scout;
+
+				case 1:
+					return Colo;
+
+				case 2:
+					return Cargo;
 			}
 		}
 };

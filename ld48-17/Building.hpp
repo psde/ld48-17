@@ -16,6 +16,12 @@ enum BuildingType
 };
 
 
+enum BuildingUpdateResult
+{
+	BuildingNothingSpecial,
+	BuildingFactoryFinished
+};
+
 class Building
 {
 	public:
@@ -96,12 +102,13 @@ class Building
 
 		// factory
 
-		queue<UnitType> factoryQueue;
+		UnitType unitInBuild;
+		int clusterMod;
 
 
 
 		Building(double x, double y, BuildingType type, RessourceArea* area = 0)
-			: x(x), y(y), type(type), energyIn(0), energyOut(-1), energyRequirement(-1), energySupplied(0), disabled(false), area(area), tick(0)
+			: x(x), y(y), type(type), energyIn(0), energyOut(-1), energyRequirement(-1), energySupplied(0), disabled(false), area(area), tick(0), maxTick(0), unitInBuild(NoUnit), clusterMod(0)
 		{
 			this->internalDepot[0] = 0;
 			this->internalDepot[1] = 0;
@@ -143,7 +150,8 @@ class Building
 			if(type == Factory)
 			{
 				energyRequirement = 25;
-				this->wantsRes[2] = 10; // testing only
+				maxTick = -1;
+				//this->wantsRes[2] = 10; // testing only
 			}
 
 			if(type == Spaceport)
@@ -152,7 +160,7 @@ class Building
 			}
 		}
 
-		void update()
+		BuildingUpdateResult update()
 		{
 			if(type == EnergyCollector)
 			{
@@ -160,20 +168,45 @@ class Building
 			}
 			else if(type == Mine)
 			{
-				if(!disabled && energyIn == energyRequirement && this->area != 0)
+				if(!disabled && energyIn >= energyRequirement && this->area != 0)
 				{
 					if(this->area->availableTons > 0)
 					{
 						tick++;
-						if(tick == maxTick)
+						if(tick >= maxTick)
 						{
 							// ressource ready!
 							this->internalDepot[this->area->type]++;
+							this->area->availableTons--;
 							tick = 0;
 						}
 					}
 				}
 			}
+			else if(type == Factory)
+			{
+				if(this->unitInBuild != NoUnit && energyIn >= energyRequirement)
+				{
+					if(this->wantsRes[0] == 0 && this->wantsRes[1] == 0 && this->wantsRes[2] == 0)
+					{
+						if(maxTick == -1)
+						{
+							this->maxTick = Unit::getUnitBuildTime(this->unitInBuild);
+							this->tick = 0;
+						}else
+						{
+							this->tick++;
+							if(this->tick >= maxTick)
+							{
+								this->maxTick = -1;
+								return BuildingFactoryFinished;
+							}
+						}
+					}
+				}
+			}
+
+			return BuildingNothingSpecial;
 		};
 };
 

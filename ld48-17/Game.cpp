@@ -1,7 +1,7 @@
 #include "Game.hpp"
 
 Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
-: graphics(graphics), input(input), selectStart(0, 0), selecting(false), cargoStep(1)
+: graphics(graphics), input(input), selectStart(0, 0), selecting(false), cargoStep(1), factory(0)
 {
 
 	this->cursor = new Gosu::Image(*graphics, L"data/cursor.png");
@@ -27,14 +27,28 @@ Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
 	Asteroid* newAsteroid1 = new Asteroid(graphics, input, resRenderer, true, 500, 300, 1, true);
 	this->asteroids.push_back(newAsteroid1);
 
-	Asteroid* newAsteroid2 = new Asteroid(graphics, input, resRenderer, true, 500, 1050, 1);
+	Asteroid* newAsteroid2 = new Asteroid(graphics, input, resRenderer, true, 700, 850, 2);
 	this->asteroids.push_back(newAsteroid2);
 
+	Asteroid* newAsteroid3 = new Asteroid(graphics, input, resRenderer, true, 2700, 1250, 3);
+	this->asteroids.push_back(newAsteroid3);
+
+	Asteroid* newAsteroid4 = new Asteroid(graphics, input, resRenderer, true, 100, 1450, 4);
+	this->asteroids.push_back(newAsteroid4);
+
+	Asteroid* newAsteroid5 = new Asteroid(graphics, input, resRenderer, true, 300, 2500, 1);
+	this->asteroids.push_back(newAsteroid5);
+
+	Asteroid* newAsteroid6 = new Asteroid(graphics, input, resRenderer, true, 900, 3050, 4);
+	this->asteroids.push_back(newAsteroid6);
+
 	this->gamemap = new Map(graphics, 5000);
+	this->gamemap->x = 200;
+	this->gamemap->y = 200;
 	this->playState = Normal;
 	this->activeAsteroid = 0;
 
-	Unit* testUnit1 = new Unit(200, 200, Cargo);
+	/*Unit* testUnit1 = new Unit(200, 200, Cargo);
 	this->units.push_back(testUnit1);
 
 	Unit* testUnit2 = new Unit(250, 200, Scout);
@@ -44,6 +58,9 @@ Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
 	this->units.push_back(testUnit3);
 
 	this->selectedUnits.push_back(testUnit3);
+
+	this->playState = FactoryGUI;
+	this->factory = this->asteroids[0]->buildings[1];*/
 
 
 }
@@ -104,8 +121,8 @@ void Game::draw()
 	this->buildRenderer->drawProp(Building(0, 0, EnergyCollector), 450, 10, 1001);
 	this->buildRenderer->drawProp(Building(0, 0, Mine), 500, 10, 1001);
 	//this->buildRenderer->drawProp(Building(0, 0, Depot), 550, 10, 1001);
-	this->buildRenderer->drawProp(Building(0, 0, Factory), 600, 10, 1001);
-	this->buildRenderer->drawProp(Building(0, 0, Spaceport), 650, 10, 1001);
+	this->buildRenderer->drawProp(Building(0, 0, Factory), 550, 10, 1001);
+	this->buildRenderer->drawProp(Building(0, 0, Spaceport), 600, 10, 1001);
 
 	int* res = this->asteroids[activeAsteroid]->getRessources();
 	this->resRenderer->draw(400, 50, 1001, Ore);
@@ -123,6 +140,22 @@ void Game::draw()
 	if(this->selectedUnits.size() == 1)
 	{
 		graphics->drawQuad(250, 700, guiBackgroundFade, 774, 700, guiBackgroundFade, 250, 768, guiBackground, 774, 768, guiBackground, 1000);
+
+		switch(this->selectedUnits[0]->type)
+		{
+			case Scout:
+				this->smallFont->draw(L"Scout", 260, 710, 1001);
+				break;
+
+			case Colo:
+				this->smallFont->draw(L"Colonization", 260, 710, 1001);
+				break;
+
+			case Cargo:
+				this->smallFont->draw(L"Cargoship", 260, 710, 1001);
+				break;
+		}
+
 
 		this->cursor_special->draw(290, 725, 1001);
 
@@ -157,13 +190,62 @@ void Game::draw()
 				this->smallFont->draw(L"No Spaceport on asteroid!", 530, 750, 1001, 1, 1, Gosu::Colors::red);
 			}
 
+			this->smallFont->draw(L"Steps: ", 530, 710, 1001);
+			this->smallFont->draw(L"1t", 570, 710, 1001, 1, 1, (this->cargoStep == 1 ? Gosu::Colors::aqua : Gosu::Colors::white));
+			this->smallFont->draw(L"10t", 585, 710, 1001, 1, 1, (this->cargoStep == 10 ? Gosu::Colors::aqua : Gosu::Colors::white));
+			this->smallFont->draw(L"100t", 605, 710, 1001, 1, 1, (this->cargoStep == 100 ? Gosu::Colors::aqua : Gosu::Colors::white));
 		}
-		this->smallFont->draw(L"Steps: ", 530, 710, 1001);
-		this->smallFont->draw(L"1t", 570, 710, 1001, 1, 1, (this->cargoStep == 1 ? Gosu::Colors::aqua : Gosu::Colors::white));
-		this->smallFont->draw(L"10t", 585, 710, 1001, 1, 1, (this->cargoStep == 10 ? Gosu::Colors::aqua : Gosu::Colors::white));
-		this->smallFont->draw(L"100t", 605, 710, 1001, 1, 1, (this->cargoStep == 100 ? Gosu::Colors::aqua : Gosu::Colors::white));
+		else
+		{
+			for(int i=0;i<3;i++)
+			{
+				this->resRenderer->draw(340 + i*60, 720, 1001, Ressource::getType(i), 1.5);
+				this->smallFont->draw(L"" + boost::lexical_cast<std::wstring>(this->selectedUnits[0]->cargo[i]) + L"t", 345 + i*60, 750, 1001);
+			}
+		}
+
 		this->smallFont->draw(L"Capacity left: " + boost::lexical_cast<std::wstring>(this->selectedUnits[0]->getCapacityLeft()) + L"t", 530, 730, 1001);
 	}
+
+
+	// Factory GUI:
+
+	if(this->playState == FactoryGUI && this->factory != 0)
+	{
+		graphics->drawQuad(250, 315, guiBackgroundFade, 774, 315, guiBackgroundFade, 250, 440, guiBackground, 774, 440, guiBackground, 1000);
+
+
+		for(int i = 0; i < 3; i ++)
+		{	
+			switch(i)
+			{
+				case 0:
+					this->bigFont->draw(L"Scout", 285 + i*160, 320, 1001);
+					break;
+
+				case 1:
+					this->bigFont->draw(L"Colonization", 285 + i*150, 320, 1001);
+					break;
+
+				case 2:
+					this->bigFont->draw(L"Cargoship", 285 + i*140, 320, 1001);
+					break;
+			}
+
+			this->unitRenderer->drawUnitProp(270 + i*160, 345, 1002, Unit::getUnitType(i), 2);
+
+			int* costs = Unit::getUnitCosts(Unit::getUnitType(i));
+			for(int r = 0; r < 3; r++)
+			{
+				this->resRenderer->draw(360 + i*160, 350 + r*20, 1001, Ressource::getType(r), 1.1);
+				this->smallFont->draw(L"" + boost::lexical_cast<std::wstring>(costs[r]), 395 + i*160, 353 + r*20, 1001);
+			}
+			
+			this->smallFont->draw(L"Buildtime:" + boost::lexical_cast<std::wstring>(Unit::getUnitBuildTime(Unit::getUnitType(i))), 355 + i*160, 353 + 3*20, 1001);
+		}
+		
+	}
+
 
 /*
 	GosuEx::Shader local(*graphics);
@@ -213,7 +295,7 @@ void Game::draw()
 	if(x > 250 && x < 774 && y > 0 && y < 70)
 	{	
 		int selection = -1;
-		for(int i = 0; i < 8; i++)
+		for(int i = 0; i < 7; i++)
 		{
 			if(Gosu::distance(x, y, 325 + i*50, 25) < 30)
 			{
@@ -277,8 +359,8 @@ void Game::draw()
 				length = 150;
 				break;
 
-			case 5:
-				/*this->smallFont->draw(L"Build Cargodepot", x+5, y+35, 5001);
+			/*case 5:
+				this->smallFont->draw(L"Build Cargodepot", x+5, y+35, 5001);
 				
 				cost = Building::getBuildingCost(Depot);
 				this->resRenderer->draw(x+5, y+50, 5001, Ore);
@@ -289,12 +371,12 @@ void Game::draw()
 
 				this->resRenderer->draw(x+95, y+50, 5001, Uranium);
 				this->smallFont->draw(L""+boost::lexical_cast<std::wstring>(cost[2]), x+120, y+53, 5001);
-*/
+
 				height = 40;
 				length = 150;
-				break;
+				break;*/
 
-			case 6:
+			case 5:
 				this->smallFont->draw(L"Build Factory", x+5, y+35, 5001);
 				
 				cost = Building::getBuildingCost(Factory);
@@ -311,7 +393,7 @@ void Game::draw()
 				length = 150;
 				break;
 
-			case 7:
+			case 6:
 				this->smallFont->draw(L"Build Spaceport", x+5, y+35, 5001);
 				
 				cost = Building::getBuildingCost(Spaceport);
@@ -344,7 +426,7 @@ void Game::update()
 
 	for(int i = 0; i < this->asteroids.size(); i++)
 	{
-		this->asteroids[i]->update();
+		this->asteroids[i]->update(this->units, this->gamemap->x, this->gamemap->y);
 
 		// check which asteroid
 
@@ -421,6 +503,26 @@ void Game::update()
 	if(gamemap->y < 0) gamemap->y = 0;
 	if(gamemap->x > gamemap->size) gamemap->x = gamemap->size;
 	if(gamemap->y > gamemap->size) gamemap->y = gamemap->size;
+
+
+	int x = (int)input->mouseX();
+	int y = (int)input->mouseY();
+
+	if(x > 950) this->gamemap->x+=5;
+	if(x > 1000) this->gamemap->x+=7;
+	if(x < 140) this->gamemap->x-=5;
+	if(x < 70) this->gamemap->x-=7;
+
+
+	if(y > 690) this->gamemap->y+=5;
+	if(y > 750) this->gamemap->y+=7;
+
+	if(!(x > 250 && x < 774 && y > 0 && y < 141))
+	{
+		if(y < 140) this->gamemap->y-=5;
+		if(y < 70) this->gamemap->y-=7;
+	}
+
 }
 
 void Game::buttonDown(Gosu::Button button)
@@ -428,6 +530,7 @@ void Game::buttonDown(Gosu::Button button)
 	if(button == Gosu::msRight)
 	{
 		this->playState = Normal;
+		this->selecting = false;
 		this->selectedUnits.clear();
 	}
 
@@ -440,7 +543,7 @@ void Game::buttonDown(Gosu::Button button)
 		if(x > 250 && x < 774 && y > 0 && y < 70)
 		{	
 			int selection = -1;
-			for(int i = 0; i < 8; i++)
+			for(int i = 0; i < 7; i++)
 			{
 				if(Gosu::distance(x, y, 325 + i*50, 25) < 30)
 				{
@@ -480,17 +583,17 @@ void Game::buttonDown(Gosu::Button button)
 					this->placingBuilding = Mine;
 					break;
 
-				case 5:
-					/*this->playState = PlaceBuilding;
-					this->placingBuilding = Depot;*/
-					break;
+				/*case 5:
+					this->playState = PlaceBuilding;
+					this->placingBuilding = Depot;
+					break;*/
 
-				case 6:
+				case 5:
 					this->playState = PlaceBuilding;
 					this->placingBuilding = Factory;
 					break;
 
-				case 7:
+				case 6:
 					this->playState = PlaceBuilding;
 					this->placingBuilding = Spaceport;
 					break;
@@ -528,6 +631,7 @@ void Game::buttonDown(Gosu::Button button)
 				if(Gosu::distance(x, y, 375 + i*60, 740) < 20) // down
 				{
 					if(this->asteroids[nearAsteroid]->getDepot()->internalDepot[i] == 0) return;
+					if(!this->asteroids[nearAsteroid]->hasSpaceport()) return;
 
 					int min = this->cargoStep;
 					if(min > this->selectedUnits[0]->getCapacityLeft()) min = this->selectedUnits[0]->getCapacityLeft();
@@ -544,6 +648,22 @@ void Game::buttonDown(Gosu::Button button)
 				if(x > 570 && x < 585 && y > 710 && y < 720) this->cargoStep = 1;
 				if(x > 585 && x < 605 && y > 710 && y < 720) this->cargoStep = 10;
 				if(x > 605 && x < 635 && y > 710 && y < 720) this->cargoStep = 100;
+			}
+		}
+		else if(this->playState == FactoryGUI)
+		{
+			for(int i = 0; i < 3; i++)
+			{
+				if(x > 270+i*160 && x < 270+140+i*160 && y > 345 && y < 500)
+				{
+					this->factory->unitInBuild = Unit::getUnitType(i);
+					this->factory->wantsRes[0] = Unit::getUnitCosts(Unit::getUnitType(i))[0];
+					this->factory->wantsRes[1] = Unit::getUnitCosts(Unit::getUnitType(i))[1];
+					this->factory->wantsRes[2] = Unit::getUnitCosts(Unit::getUnitType(i))[2];
+					
+					this->playState = Normal;
+					return;
+				}
 			}
 		}
 		else
@@ -567,6 +687,18 @@ void Game::buttonDown(Gosu::Button button)
 					this->selectedUnits.clear();
 					this->selecting = true;
 					this->selectStart = Point2D((int)input->mouseX() + this->gamemap->x, (int)input->mouseY() + this->gamemap->y);
+
+					Building* clickedBuilding = this->asteroids[activeAsteroid]->getBuildingAt((int)input->mouseX(), (int)input->mouseY(), this->gamemap->x, this->gamemap->y);
+					if(clickedBuilding != 0)
+					{
+						if(clickedBuilding->type == Factory)
+						{
+							this->factory = clickedBuilding;
+							this->playState = FactoryGUI;
+							this->selecting = false;
+							return;
+						}
+					}
 				}
 			}else{
 				this->selecting = false;
