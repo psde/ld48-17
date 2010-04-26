@@ -1,7 +1,7 @@
 #include "Game.hpp"
 
 Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
-: graphics(graphics), input(input), selectStart(0, 0), selecting(false), cargoStep(1), factory(0)
+: graphics(graphics), input(input), selectStart(0, 0), selecting(false), cargoStep(1), factory(0), quit(false)
 {
 
 	this->cursor = new Gosu::Image(*graphics, L"data/cursor.png");
@@ -30,21 +30,21 @@ Game::Game(Gosu::Graphics* graphics, Gosu::Input* input)
 	Asteroid* newAsteroid2 = new Asteroid(graphics, input, resRenderer, true, 700, 850, 2);
 	this->asteroids.push_back(newAsteroid2);
 
-	Asteroid* newAsteroid3 = new Asteroid(graphics, input, resRenderer, true, 2700, 1250, 3);
+	Asteroid* newAsteroid3 = new Asteroid(graphics, input, resRenderer, true, 1700, 1250, 3);
 	this->asteroids.push_back(newAsteroid3);
 
-	Asteroid* newAsteroid4 = new Asteroid(graphics, input, resRenderer, true, 100, 1450, 4);
+	Asteroid* newAsteroid4 = new Asteroid(graphics, input, resRenderer, true, 1200, 1450, 4);
 	this->asteroids.push_back(newAsteroid4);
 
-	Asteroid* newAsteroid5 = new Asteroid(graphics, input, resRenderer, true, 300, 2500, 1);
+	Asteroid* newAsteroid5 = new Asteroid(graphics, input, resRenderer, true, 500, 1700, 1);
 	this->asteroids.push_back(newAsteroid5);
 
-	Asteroid* newAsteroid6 = new Asteroid(graphics, input, resRenderer, true, 900, 3050, 4);
+	Asteroid* newAsteroid6 = new Asteroid(graphics, input, resRenderer, true, 100, 1050, 4);
 	this->asteroids.push_back(newAsteroid6);
 
-	this->gamemap = new Map(graphics, 5000);
-	this->gamemap->x = 200;
-	this->gamemap->y = 200;
+	this->gamemap = new Map(graphics, 3000);
+	this->gamemap->x = 350;
+	this->gamemap->y = 250;
 	this->playState = Normal;
 	this->activeAsteroid = 0;
 
@@ -418,9 +418,15 @@ void Game::draw()
 
 	// same for bottom gui
 
+	if(this->playState == Quitting)
+	{
+		graphics->drawQuad(0, 0, guiBackground, 1024, 0, guiBackground, 0, 768, guiBackgroundFade, 1024, 768, guiBackgroundFade, 5000);
+		this->bigFont->draw(L"PRESS ENTER TO QUIT", 350, 350, 5001);
+	}
+
 }
 
-void Game::update()
+bool Game::update()
 {
 	this->gamemap->update();
 
@@ -513,9 +519,11 @@ void Game::update()
 	if(x < 140) this->gamemap->x-=5;
 	if(x < 70) this->gamemap->x-=7;
 
-
-	if(y > 690) this->gamemap->y+=5;
-	if(y > 750) this->gamemap->y+=7;
+	if(!(x > 250 && x < 774 && y > 699 && y < 774))
+	{
+		if(y > 690) this->gamemap->y+=5;
+		if(y > 750) this->gamemap->y+=7;
+	}
 
 	if(!(x > 250 && x < 774 && y > 0 && y < 141))
 	{
@@ -523,10 +531,31 @@ void Game::update()
 		if(y < 70) this->gamemap->y-=7;
 	}
 
+	return this->quit;
 }
 
 void Game::buttonDown(Gosu::Button button)
 {
+	if(button == Gosu::kbEscape)
+	{
+		if(this->playState == Quitting)
+		{
+			this->playState = Normal;
+			return;
+		}
+		else
+		{
+			this->playState = Quitting;
+			return;
+		}
+	}
+
+	if((button == Gosu::kbEnter || button == Gosu::kbReturn) && this->playState == Quitting)
+	{
+		this->quit = true;
+		return;
+	}
+
 	if(button == Gosu::msRight)
 	{
 		this->playState = Normal;

@@ -126,7 +126,7 @@ class BuildingRenderer
 						this->smallFont->draw(L" " + inBuild,x+53, y+33, 1011);
 						if(build->unitInBuild != NoUnit) this->smallFont->draw(L"Completed: " + boost::lexical_cast<std::wstring>(build->tick) + L" / " + boost::lexical_cast<std::wstring>(build->maxTick),x+53, y+43, 1011);
 
-						this->smallFont->draw(L"Ressources needed:",x+53, y+53, 1011);
+						this->smallFont->draw(L"Ressources needed:",x+53, y+63, 1011);
 						this->smallFont->draw(L"Ore: " +  boost::lexical_cast<std::wstring>(build->wantsRes[0]),x+53, y+73, 1011);
 						this->smallFont->draw(L"Silicon: " + boost::lexical_cast<std::wstring>(build->wantsRes[1]),x+53, y+83, 1011);
 						this->smallFont->draw(L"Uranium: " + boost::lexical_cast<std::wstring>(build->wantsRes[2]),x+53, y+93, 1011);

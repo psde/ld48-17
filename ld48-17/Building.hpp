@@ -54,14 +54,14 @@ class Building
 			switch(type)
 			{
 				case EnergyCollector:
-					foo[0] = 5;
-					foo[1] = 15;
+					foo[0] = 30;
+					foo[1] = 10;
 					foo[2] = 0;
 					break;
 
 				case Mine:
-					foo[0] = 25;
-					foo[1] = 5;
+					foo[0] = 20;
+					foo[1] = 0;
 					foo[2] = 0;
 					break;
 
@@ -72,13 +72,13 @@ class Building
 					break;
 
 				case Factory:
-					foo[0] = 40;
+					foo[0] = 70;
 					foo[1] = 25;
 					foo[2] = 15;
 					break;
 
 				case Spaceport:
-					foo[0] = 50;
+					foo[0] = 100;
 					foo[1] = 40;
 					foo[2] = 30;
 					break;
@@ -125,15 +125,15 @@ class Building
 					switch(this->area->type)
 					{
 						case Ore:
-							this->maxTick = 250;
+							this->maxTick = 200;
 							break;
 						
 						case Silicon:
-							this->maxTick = 550;
+							this->maxTick = 400;
 							break;
 
 						case Uranium:
-							this->maxTick = 1000;
+							this->maxTick = 800;
 							break;
 					}
 				}
@@ -164,7 +164,7 @@ class Building
 		{
 			if(type == EnergyCollector)
 			{
-				energyOut = 20;
+				energyOut = 30;
 			}
 			else if(type == Mine)
 			{

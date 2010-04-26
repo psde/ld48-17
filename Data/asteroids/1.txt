@@ -1,7 +1,7 @@
-startDepot=220,215@170,70,20
+startDepot=220,215@170,90,45
 
 ressourceType=0
-ressourceTons=470
+ressourceTons=670
 ressourcePoint=226,52
 ressourcePoint=311,75
 ressourcePoint=357,125
@@ -12,7 +12,7 @@ ressourcePoint=178,94
 ressourcePoint=226,52
 
 ressourceType=1
-ressourceTons=180
+ressourceTons=380
 ressourcePoint=223,360
 ressourcePoint=307,337
 ressourcePoint=334,374
@@ -20,7 +20,7 @@ ressourcePoint=279,403
 ressourcePoint=212,401
 
 ressourceType=2
-ressourceTons=120
+ressourceTons=180
 ressourcePoint=310,281
 ressourcePoint=349,241
 ressourcePoint=392,265

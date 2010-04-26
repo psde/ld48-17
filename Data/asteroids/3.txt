@@ -1,7 +1,7 @@
 startDepot=149,150@0,0,0
 
 ressourceType=1
-ressourceTons=250
+ressourceTons=850
 ressourcePoint=191,94
 ressourcePoint=224,134
 ressourcePoint=198,171

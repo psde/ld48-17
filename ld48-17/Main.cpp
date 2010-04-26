@@ -44,13 +44,16 @@ class GosuWindow : public Gosu::Window
 
 		void update()
 		{
-			this->game->update();
+			if(this->game->update())
+			{
+				close();
+			}
 		}
 
 		void buttonDown(Gosu::Button button)
 		{
 			this->game->buttonDown(button);
-			if(button == Gosu::kbEscape) close();
+			//if(button == Gosu::kbEscape) close();
 		}
 
 		void buttonUp(Gosu::Button button)

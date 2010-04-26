@@ -40,11 +40,25 @@ struct RessourceOnLine
 	RessourceType type;
 };
 
+class LineParticle
+{
+	public:
+		double x, y;
+
+		LineParticle(double x, double y)
+			: x(x), y(y)
+		{
+
+		}
+};
+
 class Line
 {
 	public:
 		Gosu::Graphics* graphics;
 		RessourceRenderer* resRenderer;
+
+		Gosu::Image* particleImg;
 
 		Building *start, *end;
 		int type;
@@ -55,10 +69,14 @@ class Line
 		int timeout;
 		int tick;
 
-		Line(Gosu::Graphics* graphics, RessourceRenderer* resRenderer, int type, double speed = 0.4, int timeout = 70)
-			: graphics(graphics), resRenderer(resRenderer), type(type), speed(speed), tick(timeout), timeout(timeout)
+		vector<LineParticle> particles;
+		int particleTick;
+
+		Line(Gosu::Graphics* graphics, RessourceRenderer* resRenderer, int type, double speed = 0.5, int timeout = 70)
+			: graphics(graphics), resRenderer(resRenderer), type(type), speed(speed), tick(timeout), timeout(timeout), particleTick(0)
 		{
 			
+			this->particleImg = new Gosu::Image(*graphics, L"data/units/backdrop_white.png");
 		}
 
 		void draw(int x, int y)
@@ -68,7 +86,7 @@ class Line
 			Gosu::Color c2 = c1;
 			c2.setAlpha(10);
 
-			graphics->drawLine(this->start->x + x, this->start->y + y, c2, this->end->x + x, this->end->y + y, c1, 11);	
+			//graphics->drawLine(this->start->x + x, this->start->y + y, c2, this->end->x + x, this->end->y + y, c1, 11);	
 
 			if(type == 1)
 			{
@@ -79,10 +97,43 @@ class Line
 					resRenderer->draw(curRes.position.x + x - 10, curRes.position.y + y - 10, 12, curRes.type);					
 				}
 			}
+
+			for(int i=0; i < this->particles.size(); i++)
+			{
+				c1.setAlpha(120);
+				this->particleImg->drawRot(this->particles[i].x + x, this->particles[i].y + y, 11, 1, 0.5, 0.5, 0.15, 0.15, c1);
+			}
 		}
 
 		void update()
 		{
+			particleTick++;
+			if(particleTick >= 20)
+			{
+				this->particles.push_back(LineParticle(this->start->x, this->start->y));
+				particleTick = 0;
+			}
+
+			for(vector<LineParticle>::iterator it = this->particles.begin(); it != this->particles.end(); )
+			{
+					if(Gosu::distance((*it).x, (*it).y, this->end->x, this->end->y) < 10)
+					{
+						it = this->particles.erase(it);
+					}
+					else
+					{
+						double a = this->end->x - this->start->x;
+						double b = this->end->y - this->start->y;
+						double angle = atan2(b, a);
+
+
+						(*it).x += cos(angle) * speed+0.2;
+						(*it).y += sin(angle) * speed+0.2;
+						it++;
+					}
+			}
+
+
 			// Powerline
 			if(type == 0)
 			{

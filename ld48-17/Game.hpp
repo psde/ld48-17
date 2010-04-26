@@ -27,7 +27,8 @@ enum PlayingState
 	PlaceEnergyline,
 	PlaceBuilding,
 	ShipSpecial,
-	FactoryGUI
+	FactoryGUI,
+	Quitting
 };
 
 
@@ -57,6 +58,9 @@ class Game
 		int cargoStep;
 
 	public:
+
+		bool quit;
+
 		PlayingState playState;
 		BuildingType placingBuilding;
 
@@ -73,7 +77,7 @@ class Game
 
 		Game(Gosu::Graphics* graphics, Gosu::Input* input);
 
-		void update();
+		bool update();
 		void draw();
 		void buttonDown(Gosu::Button button);
 		void buttonUp(Gosu::Button button);
